@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1663501524 source:d:\_1_family\_0_alex\9_academicos\8_c_projects\controle_academico\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<locale.h>
+

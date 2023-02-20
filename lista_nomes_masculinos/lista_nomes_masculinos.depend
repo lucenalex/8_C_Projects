@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1668155116 source:d:\_1_family\_0_alex\9_academicos\8_c_projects\lista_nomes_masculinos\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

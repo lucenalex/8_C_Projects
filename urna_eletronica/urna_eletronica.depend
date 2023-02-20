@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1666957828 source:d:\_1_family\_0_alex\9_academicos\8_c_projects\urna_eletronica\untitled1.c
+
+1667043584 source:d:\_1_family\_0_alex\9_academicos\8_c_projects\urna_eletronica\main.c
+	<stdio.h>
+	<stdlib.h>
+	<locale.h>
+
