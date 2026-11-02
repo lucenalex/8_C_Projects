@@ -1,274 +1,101 @@
-/******************************************************************************
-    Clientes:
-        Universidade Estadual do Maranhão
-        Centro de Ciências Tecnológicas
-        Departamento de Engenharia da Computação
-        Curso de Engenharia da Computação
-        Disciplina: Estrutura de Dados Básica (ASL092N321)
-        Semestre: 2022.2         Turma: 01
-        Professores:
-            Lúis Carlos Fonseca
-            Pedro Brandão Neto
+/* Ordenacao - Desafio 1: tres vetores (ate 150000 inteiros).
+ * Bubble, selection e insertion: O(n^2) no pior caso. O usuario decide
+ * explicitamente antes de executar ordenacao grande; nao substitui algoritmos.
+ * Reprodutibilidade: semente fixa para teste de resultados.
+ */
+#include "algoritmos.h"
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-    Autores:
-        Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
-
-    Título: Ordenação - Desafio 1
-
-    Propósito do Programa:
-
-        Crie uma programa para preencher arbitrariamente 3 vetores
-        com no mínimo 150000 números inteiros e então ordenar cada
-        um deles usando os métodos bolha, seleção e inserção. Crie um
-        menu de texto com as seguintes opções:
-             1) Preencher aleatoriamente o primeiro vetor
-             2) Preencher aleatoriamente o segundo vetor
-             3) Preencher aleatoriamente o terceiro vetor
-             4) ImprimirVetor 1
-             5) ImprimirVetor 2
-             6) ImprimirVetor 3
-             7) Busca Sequencial (vetor1)
-             8) Ordenação por trocas - bubbleSort - (vetor1)
-             9) Ordenação por seleção (vetor2)
-            10) Ordenação por inserção (vetor3)
-            11) Busca Binária (vetor 3)
-            12) Sair
-
-    Dados de Manutenção do programa
-
-      Data            Programador                  Descrição da Mudança
-    ==========    ======================      =================================
-    2022/13/10    Alexsandro Lucena Mota      - Código original (versão 0.1).
-*******************************************************************************/
-
-#include <stdio.h>  /*> Entrada e Saída de Dados                             */
-#include <stdlib.h> /*> Para o uso da função rand e srand.                   */
-#include <time.h>   /*> Para mudar o ponto de partida da função srand()      */
-#define tam 150000      /*> Tamanho dos vetores                                  */
-
-/*****************************************************************************/
-void preencher_vetor(int *vetor,int dim){ // Preenche um vetor
-    srand(time(NULL)); // Muda o ponto de partida de rand a cada nova execução.
-    for(int i = 0; i < dim; i++){ // Varre cada posição do vetor    */
-        *(vetor + i) = rand()%100; // Atribui valor aleatório de 0 até 99.
+#define MAX_ELEMENTOS 150000U
+#define LIMIAR_LENTO 10000U
+static int ler_inteiro(const char *mensagem, int *out) {
+    char linha[128],*fim;
+    while (1) {
+        fputs(mensagem,stdout); fflush(stdout);
+        if (!fgets(linha,sizeof linha,stdin)) return 0;
+        size_t n=strcspn(linha,"\n");
+        if (linha[n]!='\n'&&!feof(stdin)) {
+            int c;while((c=getchar())!='\n'&&c!=EOF){}
+            puts("Entrada excessiva.");continue;
+        }
+        errno=0;
+        long val=strtol(linha,&fim,10);
+        while (*fim==' '||*fim=='\t'||*fim=='\n'||*fim=='\r')++fim;
+        if (fim==linha||*fim||errno||val<INT_MIN||val>INT_MAX) {
+            puts("Informe um numero inteiro valido.");continue;
+        }
+        *out=(int)val;return 1;
     }
 }
-/*---------------------------------------------------------------------------*/
-void imprimir_vetor(int *vetor,int dim){
-    for(int i = 0; i < dim; i++){
-        printf("%d ",*(vetor + i));
+static void popular(int *v, size_t n, unsigned int seed) {
+    srand(seed);
+    for (size_t i=0;i<n;++i) v[i]=rand()%100;
+}
+static void exibir(const int *v,size_t n) {
+    size_t m=n<50?n:50;
+    for(size_t i=0;i<m;++i) printf("%d%s",v[i],i+1==m?"\n":" ");
+    if(n>m) printf("Exibidos %zu dos %zu elementos; restante omitido.\n",m,n);
+}
+static int confirmar(size_t n) {
+    if(n<=LIMIAR_LENTO) return 1;
+    puts("ATENCAO: algoritmo quadratico com mais de 10000 elementos.");
+    puts("Para 150000 elementos, o custo pode ser muito elevado.");
+    int confirma;
+    if(!ler_inteiro("Executar mesmo assim? 1 sim, 0 nao: ",&confirma))return 0;
+    return confirma==1;
+}
+int main(void) {
+    int nn;
+    if(!ler_inteiro("Quantidade de elementos (1..150000): ",&nn))return 0;
+    if(nn<1||nn>(int)MAX_ELEMENTOS) {
+        fputs("Quantidade fora da faixa.\n",stderr);return 1;
     }
-};
-/*---------------------------------------------------------------------------*/
-int busca_sequencial(int valor, int *vetor, int dim){
-    printf("\n");
-    for(int i = 0; i < dim; i++){
-        if(valor == *(vetor + i)){
-            return i;
-        }
+    size_t n=(size_t)nn;
+    int *v[3]={0};
+    for(int i=0;i<3;++i) {
+        v[i]=calloc(n,sizeof *v[i]);
+        if(!v[i]) { perror("calloc");for(int j=0;j<3;++j)free(v[j]);return 1; }
     }
-    return -1;
-};
-/*---------------------------------------------------------------------------*/
-void bublesoft(int *vetor, int dim){// Ordenação por troca
-    for(int i = 0; i < dim; i++){
-        for(int j = 0; j < dim - i; j++){
-            if( *(vetor + j) > *(vetor + j + 1) ){
-                int x = *(vetor + j);
-                *(vetor + j ) = *(vetor + j + 1);
-                *(vetor + j + 1) = x;
+    int prontos[3]={0},ordenados[3]={0},op;
+    puts("Bolha, Selecao e Insercao â€” demonstracao didatica");
+    for(;;) {
+        puts("1/2/3 preencher | 4/5/6 exibir | 7 busca sequencial");
+        puts("8 bolha | 9 selecao | 10 insercao | 11 busca binaria | 12 sair");
+        if(!ler_inteiro("Opcao: ",&op)||op==12)break;
+        if(op>=1&&op<=3) {
+            int k=op-1;popular(v[k],n,(unsigned)(2026+17*k));
+            prontos[k]=1;ordenados[k]=0;printf("Vetor %d preenchido.\n",k+1);
+        } else if(op>=4&&op<=6) {
+            int k=op-4;
+            if(!prontos[k]) puts("Preencha este vetor primeiro.");
+            else exibir(v[k],n);
+        } else if(op==8||op==9||op==10) {
+            int k=op-8;
+            if(!prontos[k]) { puts("Preencha este vetor primeiro.");continue; }
+            if(!confirmar(n)) { puts("Ordenacao cancelada.");continue; }
+            if(k==0) ordenar_bolha(v[k],n);
+            else if(k==1) ordenar_selecao(v[k],n);
+            else ordenar_insercao(v[k],n);
+            ordenados[k]=1;
+            puts("Ordenacao concluida.");
+        } else if(op==7||op==11) {
+            int k=op==7?0:2,alvo;
+            if(!prontos[k]) {puts("Preencha este vetor primeiro.");continue;}
+            if(op==11&&!ordenados[k]) {
+                puts("Busca binaria exige vetor 3 ordenado; execute a insercao.");
+                continue;
             }
-        }
+            if(!ler_inteiro("Valor procurado: ",&alvo)) break;
+            int idx=op==7?buscar_sequencial(v[k],n,alvo):
+                           buscar_binaria(v[k],n,alvo);
+            if(idx<0)puts("Valor nao encontrado.");
+            else printf("Valor encontrado na posicao %d.\n",idx);
+        } else puts("Opcao invalida.");
     }
-}
-/*---------------------------------------------------------------------------*/
-int menor_item(int *vetor, int dim, int enesimo_item){
-    int minitem = enesimo_item; // item mínimo recebe o item inicial (valor)
-    for(int j = enesimo_item + 1; j < dim; j++){
-        if( *(vetor + minitem) > *(vetor + j) ){
-            minitem = j; // item mínimo recebe o indice do menor valor da lista
-        }
-    }
-    return minitem;
-}
-/*...........................................................................*/
-void selectionsort(int *vetor, int dim){
-    int x = 0, minitem = 0;
-    for(int i = 0; i < dim - 1; i++){
-        minitem = menor_item(vetor, dim, i);
-        x = *(vetor + i);
-        *(vetor + i) = *(vetor + minitem);
-        *(vetor + minitem) = x;
-    }
-};
-/*---------------------------------------------------------------------------*/
-void inserctionsort(int *vetor, int dim){
-    int copia, indice;
-    for(int i = 1; i < dim; i++){
-        copia = *(vetor + i);
-        indice = i - 1;
-        do{
-            *(vetor + indice + 1) = *(vetor + indice);
-            indice--;
-        }while( (indice >= 0) && ( copia < *(vetor + indice) ) );
-        *(vetor + indice + 1) = copia;
-    }
-}
-/*---------------------------------------------------------------------------*/
-int busca_binaria(int valor,int *vetor, int dim){
-    printf("\n");
-    int inicio = 0, fim = dim - 1, pmedia = 0;
-    do{
-        pmedia = (fim + inicio)/2;
-        if(valor == *(vetor + pmedia)){
-            return pmedia;
-        }else if(valor < *(vetor + pmedia)){
-            fim = pmedia - 1;
-        }else{
-            inicio = pmedia + 1;
-        }
-    }while(inicio <= fim);
-    return -1;
-};
-/*---------------------------------------------------------------------------*/
-int menu_select(){
-    int ch = 0;
-    do{
-        printf("Menu de Opcoes\n");
-        printf("\t 1 - Preencher aleatoriamente o primeiro vetor\n");
-        printf("\t 2 - Preencher aleatoriamente o segundo vetor\n");
-        printf("\t 3 - Preencher aleatoriamente o terceiro vetor\n");
-        printf("\t 4 - Imprimir vetor 1\n");
-        printf("\t 5 - Imprimir vetor 2\n");
-        printf("\t 6 - Imprimir vetor 3\n");
-        printf("\t 7 - Busca Sequencial (vetor 1)\n");
-        printf("\t 8 - Ordenação por trocas - bubbleSort - (vetor1)\n");
-        printf("\t 9 - Ordenação por seleção (vetor2)\n");
-        printf("\t10 - Ordenação por inserção (vetor3)\n");
-        printf("\t11 - Busca Binária (vetor 3)\n");
-        printf("\t12 - Sair.\n");
-        printf("Entre com a opcao desejada: ");
-        scanf("%d",&ch); /** Lê do teclado a seleção */
-        if((ch < 1) || (ch > 12)){
-            printf("\nOpcao Invalida! Tente novamente.\n");
-        }
-    }while( (ch < 1) || (ch > 12) );
-    return ch;
-}
-/*****************************************************************************/
-int main(){
-    printf("PROGRAMA TRES VETORES: ORDENACAO - Burble, Selection e Insection\n");
-    int choose = 0, *vetor1 = NULL, *vetor2 = NULL, *vetor3 = NULL;
-    int elemento_vetor = 0, retorno = 0;
-    vetor1 = (int *) calloc(tam,sizeof(int));
-    if(vetor1 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
-    }
-    vetor2 = (int *) calloc(tam, sizeof(int));
-    if(vetor2 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
-    }
-    vetor3 = (int *) calloc(tam,sizeof(int));
-    if(vetor3 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
-    }
-
-    do{
-        printf("\n");
-        choose = menu_select();
-        switch(choose){
-            case 1:
-                printf("\n");
-                preencher_vetor(vetor1,tam);
-                printf("Vetor preechido com sucesso!\n");
-                system("pause");
-                break;
-            case 2:
-                printf("\n");
-                preencher_vetor(vetor2,tam);
-                printf("Vetor preechido com sucesso!\n");
-                system("pause");
-                break;
-            case 3:
-                printf("\n");
-                preencher_vetor(vetor3,tam);
-                printf("Vetor preechido com sucesso!\n");
-                system("pause");
-                break;
-            case 4:
-                printf("\n");
-                printf("vetor_1 = { ");
-                imprimir_vetor(vetor1,tam);
-                printf("}\n");
-                system("pause");
-                break;
-            case 5:
-                printf("\n");
-                printf("vetor_2 = { ");
-                imprimir_vetor(vetor2,tam);
-                printf("}\n");
-                system("pause");
-                break;
-            case 6:
-                printf("\n");
-                printf("vetor_3 = { ");
-                imprimir_vetor(vetor3,tam);
-                printf("}\n");
-                system("pause");
-                break;
-            case 7:
-                printf("Informe o valor que deseja buscar: ");
-                scanf("%d",&elemento_vetor);
-                retorno = busca_sequencial(elemento_vetor,vetor1,tam);
-                if(retorno == -1){
-                    printf("Valor nao encontrado. ");
-                    printf("Nao eh uma componente deste vetor.\n");
-                }else{
-                    printf("valor encontrado na posicao %d do vetor: ", retorno);
-                    printf("v[%d] = %d.\n", retorno, *(vetor1 + retorno));
-                }
-                system("pause");
-                break;
-            case 8:
-                bublesoft(vetor1, tam);
-                printf("Ordenação realizada como sucesso!\n");
-                system("pause");
-                break;
-            case 9:
-                selectionsort(vetor2, tam);
-                printf("Ordenação realizada como sucesso!\n");
-                system("pause");
-                break;
-            case 10:
-                inserctionsort(vetor3, tam);
-                printf("Ordenação realizada como sucesso!\n");
-                system("pause");
-                break;
-            case 11:
-                printf("Informe o valor que deseja buscar: ");
-                scanf("%d",&elemento_vetor);
-                retorno = busca_binaria(elemento_vetor,vetor3,tam);
-                if(retorno == -1){
-                    printf("Valor nao encontrado. ");
-                    printf("Nao eh uma componente deste vetor.\n");
-                }else{
-                    printf("valor encontrado na posicao %d do vetor: ", retorno);
-                    printf("vetor[%d] = %d.\n", retorno, *(vetor3 + retorno));
-                }
-                system("pause");
-                break;
-            case 12:
-                printf("\nVoce escolheu sair do programa.\n");
-                exit(0);//return 0;
-        }
-    }while(choose != 12);
-    free(vetor1);
-    free(vetor2);
-    free(vetor3);
+    for(int i=0;i<3;++i)free(v[i]);
     return 0;
 }
-/*****************************************************************************/
