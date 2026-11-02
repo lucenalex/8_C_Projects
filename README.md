@@ -52,8 +52,8 @@ O workflow `.github/workflows/source-syntax.yml` executa as verificações no Gi
 - A agenda e o controle acadêmico são demonstrações em memória e não devem armazenar dados pessoais reais.
 - `criar_arquivo` usa somente entradas/arquivos sintéticos nos testes. O enunciado histórico de um milhão de elementos é **incompatível com uma demonstração prática baseada em três algoritmos `O(n^2)`**; a execução agora é limitada e protege contra sobrescrita.
 - A versão original dos programas permanece recuperável no histórico Git. Um teste verde **não comprova ausência completa de defeitos**, compatibilidade Windows/GUI nem identidade de binários gerados.
-- O [PR #2](https://github.com/lucenalex/8_C_Projects/pull/2) de remoção ampla de 33 artefatos e o [PR #16](https://github.com/lucenalex/8_C_Projects/pull/16), restrito a 17 arquivos `.o`, continuam **em rascunho e sem integração**. **Nenhum executável `.exe` histórico foi removido.**
-- Há backup Git independente de revisão anterior restaurado e verificado; após qualquer merge novo, atualizar snapshot antes de excluir arquivos. `.gitignore` **não remove objetos já rastreados**.
+- O [PR #2](https://github.com/lucenalex/8_C_Projects/pull/2) de remoção ampla de 33 artefatos e o [PR #16](https://github.com/lucenalex/8_C_Projects/pull/16), restrito a 17 arquivos `.o`, têm situações distintas: **PR #2 ainda em rascunho; PR #16 integrado após verificação de backup e do manifesto**. **Nenhum executável `.exe` histórico foi removido.**
+- Os backups Git anteriores à limpeza de 02/11/2026 foram restaurados e verificados fora do GitHub, incluindo o commit `22756dec` que ainda contém os objetos removidos. A documentação da limpeza está em [RELATORIO-LIMPEZA-OBJETOS-2026-11-02.md](RELATORIO-LIMPEZA-OBJETOS-2026-11-02.md). Manter cópias externas, pois os artefatos GitHub Actions expiram. `.gitignore` **não remove objetos já rastreados**.
 
 ## Documentação técnica
 
