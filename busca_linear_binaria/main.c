@@ -1,39 +1,39 @@
 /******************************************************************************
     Clientes:
-        Universidade Estadual do Maranhão
-        Centro de Ciências Tecnológicas
-        Departamento de Engenharia da Computação
-        Curso de Engenharia da Computação
-        Disciplina: Estrutura de Dados Básica (ASL092N321)
+        Universidade Estadual do MaranhÃ£o
+        Centro de CiÃªncias TecnolÃ³gicas
+        Departamento de Engenharia da ComputaÃ§Ã£o
+        Curso de Engenharia da ComputaÃ§Ã£o
+        Disciplina: Estrutura de Dados BÃ¡sica (ASL092N321)
         Semestre: 2022.2         Turma: 01
         Professores:
-            Lúis Carlos Fonseca
-            Pedro Brandão Neto
+            LÃºis Carlos Fonseca
+            Pedro BrandÃ£o Neto
 
     Autores:
         Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
+            Alexsandro Lucena Mota   CÃ³digo: 20210024710
 
-    Título: Atividade Prática
+    TÃ­tulo: Atividade PrÃ¡tica
 
-    Propósito do Programa:
+    PropÃ³sito do Programa:
 
-        Crie uma programa para preencher 2 vetores: Um não ordenado e o outro
-        ordenado. Ambos com tamanho 8. Usar funções. Crie um menu de texto com
-        as seguintes opções:
+        Crie uma programa para preencher 2 vetores: Um nÃ£o ordenado e o outro
+        ordenado. Ambos com tamanho 8. Usar funÃ§Ãµes. Crie um menu de texto com
+        as seguintes opÃ§Ãµes:
             1) Preencher vetor 1
             2) Preencher vetor 2
             3) Busca Sequencial (vetor 1)
-            4) Busca Binária (vetor 2)
+            4) Busca BinÃ¡ria (vetor 2)
             5) Imprimir vetor 1
             6) Imprimir vetor 2
             7) Sair.
 
-    Dados de Manutenção do programa
+    Dados de ManutenÃ§Ã£o do programa
 
-      Data            Programador                  Descrição da Mudança
+      Data            Programador                  DescriÃ§Ã£o da MudanÃ§a
     ==========    ======================      =================================
-    2022/12/10    Alexsandro Lucena Mota      - Código original (versão 0.1).
+    2022/12/10    Alexsandro Lucena Mota      - CÃ³digo original (versÃ£o 0.1).
 *******************************************************************************/
 
 #include <stdio.h>
@@ -52,18 +52,18 @@ int main(){
     int choose = 0, *vetor1 = NULL, *vetor2 = NULL;
     int elemento_vetor = 0, retorno = 0;
     vetor1 = (int *) malloc(tam*sizeof(int));
-    if(vetor1 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
+    if(vetor1 == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+        printf("Erro: MemÃ³ria Insuficiente!\n");
         exit(1);
     }
     vetor2 = (int *) malloc(tam*sizeof(int));
-    if(vetor2 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
+    if(vetor2 == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+        printf("Erro: MemÃ³ria Insuficiente!\n");
         exit(1);
     }
     for(int i = 0; i < tam; i++){
-        *(vetor1 + i) = NULL;
-        *(vetor2 + i) = NULL;
+        *(vetor1 + i) = 0;
+        *(vetor2 + i) = 0;
     }
     do{
         printf("\n");
@@ -118,7 +118,7 @@ int main(){
                 break;
             case 7:
                 printf("\nVoce escolheu sair do programa.\n");
-                exit(0);//return 0;
+                break; /* liberar memÃ³ria antes de sair */
         }
     }while(choose != 7);
     free(vetor1);
@@ -133,12 +133,12 @@ int menu_select(){
         printf("\t1 - Preencher vetor 1 (Desordenado)\n");
         printf("\t2 - Preencher vetor 2 (Ordenado)\n");
         printf("\t3 - Busca Sequencial (vetor 1)\n");
-        printf("\t4 - Busca Binária (vetor 2)\n");
+        printf("\t4 - Busca BinÃ¡ria (vetor 2)\n");
         printf("\t5 - Imprimir vetor 1\n");
         printf("\t6 - Imprimir vetor 2\n");
         printf("\t7 - Sair.\n");
         printf("Entre com a opcao desejada: ");
-        scanf("%d",&ch); /** Lê do teclado a seleção */
+        if (scanf("%d", &ch) != 1) return 7; /* EOF encerra o menu */
         if((ch < 1) || (ch > 7)){
             printf("\nOpcao Invalida! Tente novamente.\n");
         }
