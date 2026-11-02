@@ -18,7 +18,10 @@ int main(void) {
     assert(lista_remover(&l,42));
     assert(lista_contem(l,42));
     assert(lista_remover(&l,42));
+    assert(lista_contem(l,42)); /* a lista de 0..999 ja incluia 42 */
+    assert(lista_remover(&l,42));
     assert(!lista_contem(l,42));
+    assert(lista_tamanho(l)==996);
     lista_limpar(&l);
     assert(l==NULL);
     lista_limpar(&l); /* idempotente */
