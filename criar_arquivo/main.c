@@ -1,34 +1,37 @@
+#if !defined(_WIN32)
+#define _POSIX_C_SOURCE 200809L /* clock_gettime no modo C11 estrito */
+#endif
 /******************************************************************************
     Clientes:
-        Universidade Estadual do Maranhão
-        Centro de Ciências Tecnológicas
-        Departamento de Engenharia da Computação
-        Curso de Engenharia da Computação
-        Disciplina: Estrutura de Dados Básica (ASL092N321)
+        Universidade Estadual do MaranhÃ£o
+        Centro de CiÃªncias TecnolÃ³gicas
+        Departamento de Engenharia da ComputaÃ§Ã£o
+        Curso de Engenharia da ComputaÃ§Ã£o
+        Disciplina: Estrutura de Dados BÃ¡sica (ASL092N321)
         Semestre: 2022.4         Turma: 01
         Professores:
             Igor Ramos Campos
 
     Autores:
         Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
+            Alexsandro Lucena Mota   CÃ³digo: 20210024710
 
-    Título: Ordenação
+    TÃ­tulo: OrdenaÃ§Ã£o
 
-    Propósito do Programa:
+    PropÃ³sito do Programa:
 
-        - Gerar arquivo de 1000000 de números;
-        - Implementar os algoritimos de ordenação:
+        - Gerar arquivo de 1000000 de nÃºmeros;
+        - Implementar os algoritimos de ordenaÃ§Ã£o:
             - Burble Sort,
             - Selection Sort,
             - Inserction Sort;
-        - Fazer um relatório de performace.
+        - Fazer um relatÃ³rio de performace.
 
-    Dados de Manutenção do programa
+    Dados de ManutenÃ§Ã£o do programa
 
-      Data            Programador                  Descrição da Mudança
+      Data            Programador                  DescriÃ§Ã£o da MudanÃ§a
     ==========    ======================      =================================
-    2023/30/01    Alexsandro Lucena Mota      - Código original (versão 0.1).
+    2023/30/01    Alexsandro Lucena Mota      - CÃ³digo original (versÃ£o 0.1).
 
 *******************************************************************************/
 /******************************************************************************/
@@ -39,7 +42,7 @@
 #include <locale.h>
 #include <unistd.h>
 /******************************************************************************/
-#define tam 10 // Quantidade de números a serem gerados
+#define tam 10 // Quantidade de nÃºmeros a serem gerados
 #define BILLION  1000000000.0
 /******************************************************************************/
 void gerar_vetor_de_numeros(int *vetor,int dim);
@@ -56,30 +59,30 @@ void inserctionsort(int *vetor, int dim);
 int main(){
     setlocale(LC_ALL,"Portuguese");
 
-    printf("\n\t******* PROGRAMA GERA UM MILHÃO DE NÚMEROS E ORDENA *******\n");
+    printf("\n\t******* PROGRAMA GERA UM MILHÃƒO DE NÃšMEROS E ORDENA *******\n");
 
-    printf("\n\tEste programa irá gerar mil números e armazená-los em\n");
+    printf("\n\tEste programa irÃ¡ gerar mil nÃºmeros e armazenÃ¡-los em\n");
     printf("\n\tum arquivo chamado um_milhao_de_numeros.txt\n");
 
-    printf("\n\t*************** GERANDO UM MILHÃO DE NÚMEROS **************\n\t");
+    printf("\n\t*************** GERANDO UM MILHÃƒO DE NÃšMEROS **************\n\t");
     system("pause");
 
     int *vetor = NULL;
 
     vetor = (int *) calloc(tam,sizeof(int));
-    if(vetor == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
+    if(vetor == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+        printf("Erro: MemÃ³ria Insuficiente!\n");
         exit(1);
     }
 
     gerar_vetor_de_numeros(vetor,tam);
 
-    printf("\n\tNúmeros gerados com sucesso!\n\t");
+    printf("\n\tNÃºmeros gerados com sucesso!\n\t");
     system("pause");
 
 //-----------------------------------------------------------------------------
 
-    printf("\n\t******* CRIANDO O ARQUIVO E SALVANDO OS NÚMEROS *******\n");
+    printf("\n\t******* CRIANDO O ARQUIVO E SALVANDO OS NÃšMEROS *******\n");
 
     FILE *file;
 
@@ -91,8 +94,8 @@ int main(){
         exit(1);
     }
     else{
-        printf("\n\tCriação do arquivo foi bem-sucedida!\n");
-        printf("\n\tSalvando os números no arquivo.\n");
+        printf("\n\tCriaÃ§Ã£o do arquivo foi bem-sucedida!\n");
+        printf("\n\tSalvando os nÃºmeros no arquivo.\n");
 
         for(int i = 0; i < tam; i++){
             fprintf(file,"%d\n",*(vetor + i));
@@ -105,10 +108,10 @@ int main(){
 //-----------------------------------------------------------------------------
     free(vetor);
 
-    printf("\n\t**************** IMPRESSÃO NA TELA ****************\n");
+    printf("\n\t**************** IMPRESSÃƒO NA TELA ****************\n");
 
-    printf("\n\tDeseja abrir o arquivo, lê os números e imprimir na tela?");
-    printf("\n\t(1) Sim\t(2) Não.\n");
+    printf("\n\tDeseja abrir o arquivo, lÃª os nÃºmeros e imprimir na tela?");
+    printf("\n\t(1) Sim\t(2) NÃ£o.\n");
 
     printf("\n\tInforme a sua escolha: ");
     int choose;
@@ -136,8 +139,8 @@ int main(){
 
         v_file = (int *) calloc(tam,sizeof(int));
 
-        if(v_file == NULL){ // teste de alocação de memória
-            printf("Erro: Memória Insuficiente!\n");
+        if(v_file == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+            printf("Erro: MemÃ³ria Insuficiente!\n");
             exit(1);
         }
         int count =0;
@@ -145,7 +148,7 @@ int main(){
             fscanf(file,"%d",(v_file + count));
             count++;
         }
-        printf("\n\tLista de números salvos no arquivo:\n\n");
+        printf("\n\tLista de nÃºmeros salvos no arquivo:\n\n");
         imprimir_vetor(v_file,tam);
 
         free(v_file);
@@ -153,12 +156,12 @@ int main(){
         fclose(file);
     }
 
-    printf("\n\t**************** ORDENAÇÃO DOS NÚMEROS ****************\n");
+    printf("\n\t**************** ORDENAÃ‡ÃƒO DOS NÃšMEROS ****************\n");
 
-    printf("\n\tDeseja abrir o arquivo, lê os números e executar os métodos");
-    printf("\n\tde ordenação Burble Sort, Select Sort e Inserction Sort,");
-    printf("\n\tnessa ordem?(1) Sim.\t(2) Não, sair do programa.");
-    printf("\n\tInforme sua decisão: ");
+    printf("\n\tDeseja abrir o arquivo, lÃª os nÃºmeros e executar os mÃ©todos");
+    printf("\n\tde ordenaÃ§Ã£o Burble Sort, Select Sort e Inserction Sort,");
+    printf("\n\tnessa ordem?(1) Sim.\t(2) NÃ£o, sair do programa.");
+    printf("\n\tInforme sua decisÃ£o: ");
 
     scanf("%d",&choose);
 
@@ -187,8 +190,8 @@ int main(){
         int *v_burble = NULL;
         v_burble = (int *) calloc(tam,sizeof(int));
 
-        if(v_burble == NULL){ // teste de alocação de memória
-            printf("Erro: Memória Insuficiente!\n");
+        if(v_burble == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+            printf("Erro: MemÃ³ria Insuficiente!\n");
             exit(1);
         }
 
@@ -208,21 +211,21 @@ int main(){
 
         clock_gettime(CLOCK_REALTIME, &end);
 
-        printf("\n\tOrdenação realizada como sucesso!\n\t");
+        printf("\n\tOrdenaÃ§Ã£o realizada como sucesso!\n\t");
         system("pause");
 
-        // burble_sort_time = fim - início
+        // burble_sort_time = fim - inÃ­cio
         burble_sort_time = (end.tv_sec - start.tv_sec) +
                            (end.tv_nsec - start.tv_nsec) / BILLION;
 
-        printf("\n\tTempo de execução do Burble Sort: %.7f s.\n", burble_sort_time);
+        printf("\n\tTempo de execuÃ§Ã£o do Burble Sort: %.7f s.\n", burble_sort_time);
 
-        printf("\n\tDeseja imprimir a lista de números ordenados? (1) Sim\t(2) Não");
-        printf("\n\tInforme sua decisão: ");
+        printf("\n\tDeseja imprimir a lista de nÃºmeros ordenados? (1) Sim\t(2) NÃ£o");
+        printf("\n\tInforme sua decisÃ£o: ");
         scanf("%d",&choose);
 
         if(choose == 1){
-            printf("\n\tLista de números salvos em arquivo: ");
+            printf("\n\tLista de nÃºmeros salvos em arquivo: ");
             imprimir_vetor(v_burble,tam);
         }
 
@@ -235,8 +238,8 @@ int main(){
 
         v_selection = (int *) calloc(tam,sizeof(int));
 
-        if(v_selection == NULL){ // teste de alocação de memória
-            printf("Erro: Memória Insuficiente!\n");
+        if(v_selection == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+            printf("Erro: MemÃ³ria Insuficiente!\n");
             exit(1);
         }
 
@@ -252,21 +255,21 @@ int main(){
 
         clock_gettime(CLOCK_REALTIME, &end);
 
-        printf("\n\tOrdenação realizada como sucesso!\n\t");
+        printf("\n\tOrdenaÃ§Ã£o realizada como sucesso!\n\t");
         system("pause");
 
-        // selection_sort_time = fim - início
+        // selection_sort_time = fim - inÃ­cio
         selection_sort_time = (end.tv_sec - start.tv_sec) +
                               (end.tv_nsec - start.tv_nsec) / BILLION;
 
-        printf("\n\tTempo de execução do Selection Sort: %.7f s.\n", selection_sort_time);
+        printf("\n\tTempo de execuÃ§Ã£o do Selection Sort: %.7f s.\n", selection_sort_time);
 
-        printf("\n\tDeseja imprimir a lista de números ordenados? (1) Sim,\t(2) Não");
-        printf("\n\tInforme sua decisão: ");
+        printf("\n\tDeseja imprimir a lista de nÃºmeros ordenados? (1) Sim,\t(2) NÃ£o");
+        printf("\n\tInforme sua decisÃ£o: ");
         scanf("%d",&choose);
 
         if(choose == 1){
-            printf("\n\tLista de números salvos em arquivo:\n\n");
+            printf("\n\tLista de nÃºmeros salvos em arquivo:\n\n");
             imprimir_vetor(v_selection,tam);
         }
 
@@ -280,8 +283,8 @@ int main(){
 
         v_inserction = (int *) calloc(tam,sizeof(int));
 
-        if(v_inserction == NULL){ // teste de alocação de memória
-            printf("Erro: Memória Insuficiente!\n");
+        if(v_inserction == NULL){ // teste de alocaÃ§Ã£o de memÃ³ria
+            printf("Erro: MemÃ³ria Insuficiente!\n");
             exit(1);
         }
 
@@ -297,21 +300,21 @@ int main(){
 
         clock_gettime(CLOCK_REALTIME, &end);
 
-        printf("\n\tOrdenação realizada como sucesso!\n\t");
+        printf("\n\tOrdenaÃ§Ã£o realizada como sucesso!\n\t");
         system("pause");
 
-        // inserction_sort_time = fim - início
+        // inserction_sort_time = fim - inÃ­cio
         inserction_sort_time = (end.tv_sec - start.tv_sec) +
                                (end.tv_nsec - start.tv_nsec) / BILLION;
 
-        printf("\n\tTempo de execução do Inserction Sort: %.7f s.\n", selection_sort_time);
+        printf("\n\tTempo de execuÃ§Ã£o do Inserction Sort: %.7f s.\n", selection_sort_time);
 
-        printf("\n\tDeseja imprimir a lista de números ordenados? (1) Sim\t(2) Não");
-        printf("\n\tInforme sua decisão: \n");
+        printf("\n\tDeseja imprimir a lista de nÃºmeros ordenados? (1) Sim\t(2) NÃ£o");
+        printf("\n\tInforme sua decisÃ£o: \n");
         scanf("%d",&choose);
 
         if(choose == 1){
-            printf("\n\tLista de números salvos em arquivo:\n\n");
+            printf("\n\tLista de nÃºmeros salvos em arquivo:\n\n");
             imprimir_vetor(v_inserction,tam);
         }
 
@@ -322,7 +325,7 @@ int main(){
         printf("\n\t");
         system("pause");
 
-        printf("\n\t**************** RELATÓRIO DE PERFOMACE ***************\n");
+        printf("\n\t**************** RELATÃ“RIO DE PERFOMACE ***************\n");
 
         printf("\n\t    Burble Sort = %.7f;\n",burble_sort_time);
         printf("\n\t  Selecton Sort = %.7f;\n",selection_sort_time);
@@ -333,9 +336,9 @@ int main(){
 }
 /******************************************************************************/
 void gerar_vetor_de_numeros(int *vetor,int dim){ // Preenche um vetor
-    srand(time(NULL)); // Muda o ponto de partida de rand a cada nova execução.
-    for(int i = 0; i < dim; i++){ // Varre cada posição do vetor    */
-        *(vetor + i) = rand()%tam; // Atribui valor aleatório de 0 até 1000000.
+    srand(time(NULL)); // Muda o ponto de partida de rand a cada nova execuÃ§Ã£o.
+    for(int i = 0; i < dim; i++){ // Varre cada posiÃ§Ã£o do vetor    */
+        *(vetor + i) = rand()%tam; // Atribui valor aleatÃ³rio de 0 atÃ© 1000000.
     }
 }
 /******************************************************************************/
@@ -346,7 +349,7 @@ void imprimir_vetor(int *vetor,int dim){
     printf("\n");
 };
 /******************************************************************************/
-void bublesort(int *vetor, int dim){// Ordenação por troca
+void bublesort(int *vetor, int dim){// OrdenaÃ§Ã£o por troca
     for(int i = 0; i < dim; i++){
         for(int j = 0; j < dim - i; j++){
             if( *(vetor + j) > *(vetor + j + 1) ){
@@ -359,10 +362,10 @@ void bublesort(int *vetor, int dim){// Ordenação por troca
 }
 /******************************************************************************/
 int menor_item(int *vetor, int dim, int enesimo_item){
-    int minitem = enesimo_item; // item mínimo recebe o item inicial (valor)
+    int minitem = enesimo_item; // item mÃ­nimo recebe o item inicial (valor)
     for(int j = enesimo_item + 1; j < dim; j++){
         if( *(vetor + minitem) > *(vetor + j) ){
-            minitem = j; // item mínimo recebe o indice do menor valor da lista
+            minitem = j; // item mÃ­nimo recebe o indice do menor valor da lista
         }
     }
     return minitem;
