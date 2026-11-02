@@ -18,7 +18,17 @@ while IFS= read -r -d '' file; do
   log="$OUT_DIR/$id.log"
   work="$OUT_DIR/work-$id"
   mkdir -p -- "$work"
-  if ! command -v "$compiler" >/dev/null 2>&1; then
+  relative=${file#"$ROOT"/}
+  # Explicitly classify non-source and platform-dependent files.
+  # These are not PASS and will not count as validated.
+  if [[ "$lang" == fortran && "$relative" == "temp_convertion.rtf.f08" ]] &&
+     head -c 6 "$file" | grep -qF '{\rtf1'; then
+    result=SKIP_RTF_DOCUMENT
+    printf 'File is RTF, not Fortran source.\n' > "$log"
+  elif [[ "$lang" == fortran && "$relative" == "test/Aec32BitAppServer57.f90" ]]; then
+    result=SKIP_WINDOWS_COM
+    printf 'Requires Intel Fortran/Windows COM modules.\n' > "$log"
+  elif ! command -v "$compiler" >/dev/null 2>&1; then
     result=NO_COMPILER
     printf 'Required compiler %s not found\n' "$compiler" > "$log"
     missing=$((missing+1))
@@ -29,7 +39,10 @@ while IFS= read -r -d '' file; do
       result=FAIL; failed=$((failed+1))
     fi
   else
-    if (cd "$work" && gfortran -std=f2018 -Wall -Wextra -fsyntax-only -J "$work" -I "$(dirname "$file")" "$file") > "$log" 2>&1; then
+    extra_flags=()
+    # Legacy source with misleading .f suffix contains free-format code.
+    if [[ "$relative" == "test/test.f03.f" ]]; then extra_flags=(-ffree-form); fi
+    if (cd "$work" && gfortran -std=f2018 -Wall -Wextra -fsyntax-only -J "$work" -I "$(dirname "$file")" "${extra_flags[@]}" "$file") > "$log" 2>&1; then
       result=PASS; passed=$((passed+1))
     else
       result=FAIL; failed=$((failed+1))
@@ -37,7 +50,6 @@ while IFS= read -r -d '' file; do
   fi
   wc=$(grep -ci 'warning:' "$log" || true)
   warnings=$((warnings+wc))
-  relative=${file#"$ROOT"/}
   safe=${relative//\"/\"\"}
   printf '"%s",%s,%s,%s,%s\n' "$safe" "$lang" "$result" "$wc" "$id.log" >> "$REPORT"
 done < <(find "$ROOT" -type f \( -iname '*.c' -o -iname '*.f' -o -iname '*.for' -o -iname '*.f77' -o -iname '*.f03' -o -iname '*.f08' -o -iname '*.f90' -o -iname '*.f95' -o -iname '*.f18' \) ! -path '*/.git/*' -print0 | sort -z)
