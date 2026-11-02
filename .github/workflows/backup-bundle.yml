@@ -1,5 +1,9 @@
 name: Full Git bundle snapshot (read-only)
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backup-bundle.yml'
   pull_request:
     branches: [main]
     paths:
