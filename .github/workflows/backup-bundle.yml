@@ -36,11 +36,23 @@ jobs:
           (cd "$RUNNER_TEMP/github-backup" && sha256sum repository.bundle > SHA256SUMS.txt)
           git rev-parse HEAD > "$RUNNER_TEMP/github-backup/actions-checkout-head.txt"
           ls -lh "$RUNNER_TEMP/github-backup/repository.bundle"
+      - name: Restore snapshot independently and verify all Git objects
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot="$RUNNER_TEMP/github-backup/repository.bundle"
+          expected="$(git rev-parse refs/remotes/origin/main)"
+          (cd "$RUNNER_TEMP/github-backup" && sha256sum --check SHA256SUMS.txt)
+          git clone --mirror "$snapshot" "$RUNNER_TEMP/restored-repository.git"
+          git --git-dir="$RUNNER_TEMP/restored-repository.git" fsck --full --strict
+          git --git-dir="$RUNNER_TEMP/restored-repository.git" cat-file -e "${expected}^{commit}"
+          printf '%s\n' "$expected" > "$RUNNER_TEMP/github-backup/verified-main-commit.txt"
+          printf 'RESTORE_OK: %s\n' "$expected"
       - name: Upload full Git bundle and checksum
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: full-git-bundle
           path: ${{ runner.temp }}/github-backup/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
           compression-level: 0
