@@ -23,7 +23,8 @@ PROGRAM example
     IF (ios /= 0) THEN
         PRINT *, 'Entrada invalida para x.'
         STOP 1
-    END IF O valor digitado não pode
+    END IF
+    ! O valor digitado não pode
     ! conter ponto (.). Caso isto aconteça, pode ocorrer um erro de execução
     ! do programa, abortando o mesmo.
     PRINT*, "Valor lido: ",x
