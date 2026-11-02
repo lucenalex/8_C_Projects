@@ -141,7 +141,7 @@ erro:
 }
 int urna_exportar_eleitores(const Urna *u,const char *arquivo) {
     if(!u||!arquivo)return 0;
-    FILE *fp=fopen(arquivo,"w");
+    FILE *fp=fopen(arquivo,"wx"); /* C11: nao sobrescreve arquivo preexistente */
     if(!fp)return 0;
     int erro=fputs("codigo;nome_ficticio;votou\n",fp)==EOF;
     for(size_t i=0;i<u->total_eleitores&&!erro;++i) {
