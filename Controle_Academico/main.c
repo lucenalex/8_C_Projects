@@ -21,6 +21,13 @@ static int ler_inteiro(const char *mensagem, int *valor) {
     for (;;) {
         fputs(mensagem, stdout);
         if (!fgets(linha, sizeof linha, stdin)) return 0;
+        size_t comprimento = strcspn(linha, "\n");
+        if (linha[comprimento] != '\n' && !feof(stdin)) {
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF) {}
+            puts("Entrada muito longa; tente novamente.");
+            continue;
+        }
         errno = 0;
         v = strtol(linha, &fim, 10);
         while (isspace((unsigned char)*fim)) fim++;
@@ -53,6 +60,13 @@ static int ler_nota(float *valor) {
     for (;;) {
         fputs("Média (0 a 10): ", stdout);
         if (!fgets(linha, sizeof linha, stdin)) return 0;
+        size_t comprimento = strcspn(linha, "\n");
+        if (linha[comprimento] != '\n' && !feof(stdin)) {
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF) {}
+            puts("Entrada muito longa; tente novamente.");
+            continue;
+        }
         errno = 0; v = strtof(linha, &fim);
         while (isspace((unsigned char)*fim)) fim++;
         if (errno == 0 && fim != linha && *fim == '\0' && v >= 0.f && v <= 10.f) {
