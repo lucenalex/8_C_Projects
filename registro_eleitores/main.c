@@ -19,6 +19,12 @@ static int ler_codigo(const char *mensagem, int *saida) {
     long v;
     fputs(mensagem, stdout);
     if (!fgets(texto, sizeof texto, stdin)) return 0;
+    size_t tamanho = strcspn(texto, "\n");
+    if (texto[tamanho] != '\n' && !feof(stdin)) {
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF) {}
+        return -1;
+    }
     errno = 0;
     v = strtol(texto, &fim, 10);
     if (errno || fim == texto || (*fim != '\n' && *fim != '\0') || v < 1 || v > INT_MAX)
@@ -31,7 +37,12 @@ static int ler_texto(const char *mensagem, char *saida, size_t capacidade) {
     fputs(mensagem, stdout);
     if (!fgets(linha, sizeof linha, stdin)) return 0;
     size_t n = strcspn(linha, "\n");
-    if (n == 0 || n >= capacidade || n == sizeof linha - 1) {
+    if (linha[n] != '\n' && !feof(stdin)) {
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF) {}
+        puts("Texto vazio ou maior que o limite."); return -1;
+    }
+    if (n == 0 || n >= capacidade) {
         puts("Texto vazio ou maior que o limite."); return -1;
     }
     memcpy(saida, linha, n); saida[n] = '\0';
