@@ -1,0 +1,61 @@
+name: Source syntax audit (corrected sources)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/source-syntax.yml'
+      - 'tools/check_sources.sh'
+      - '**/*.c'
+      - '**/*.f'
+      - '**/*.for'
+      - '**/*.f77'
+      - '**/*.f03'
+      - '**/*.f08'
+      - '**/*.f90'
+      - '**/*.f95'
+      - '**/*.f18'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    name: GCC and GFortran syntax only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout without credentials persistence
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Compiler versions
+        run: |
+          gcc --version | head -1
+          gfortran --version | head -1
+      - name: Inspect complete checkout (no programs executed)
+        id: audit
+        shell: bash
+        run: |
+          set +e
+          bash tools/check_sources.sh "$RUNNER_TEMP/source-audit"
+          status=$?
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          test -s "$RUNNER_TEMP/source-audit/results.csv"
+          test "$status" -eq 0
+      - name: Report totals
+        if: always()
+        shell: bash
+        run: |
+          if test -f "$RUNNER_TEMP/source-audit/results.csv"; then
+            awk -F, 'NR>1 { cnt[$3]++ } END { for (x in cnt) print x ": " cnt[x] }' "$RUNNER_TEMP/source-audit/results.csv"
+            head -n 30 "$RUNNER_TEMP/source-audit/results.csv"
+          fi
+      - name: Upload logs and full CSV
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: source-audit-results
+          path: ${{ runner.temp }}/source-audit/
+          retention-days: 7
+          if-no-files-found: warn
