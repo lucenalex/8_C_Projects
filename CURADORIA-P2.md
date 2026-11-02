@@ -1,6 +1,6 @@
 # Curadoria proposta — C (2026-11-02)
 
-> **Registro histórico de baseline:** os totais de arquivos abaixo correspondem à árvore original auditada, não ao estado após os PRs de correção. Os 17 projetos Code::Blocks já compilaram no Windows e os seis exercícios legados foram submetidos a testes funcionais. Para resultados atuais, consulte [README.md](README.md), [validação Windows](VALIDACAO-WINDOWS-AMPLIADA-17-CBP-2026-11-02.md) e [seis projetos testados](VALIDACAO-FUNCIONAL-SEIS-PROJETOS-2026-11-02.md). **PRs de limpeza #2 e #16 seguem em rascunho; nenhum `.exe` foi excluído.**
+> **Registro histórico de baseline:** os totais de arquivos abaixo correspondem à árvore original auditada, não ao estado após os PRs de correção. Os 17 projetos Code::Blocks já compilaram no Windows e os seis exercícios legados foram submetidos a testes funcionais. Para resultados atuais, consulte [README.md](README.md), [validação Windows](VALIDACAO-WINDOWS-AMPLIADA-17-CBP-2026-11-02.md) e [seis projetos testados](VALIDACAO-FUNCIONAL-SEIS-PROJETOS-2026-11-02.md). **PR #2 permanece em rascunho; PR #16 foi integrado, retirando somente 17 `.o`; nenhum `.exe` foi excluído.**
 
 
 ## Inventário
