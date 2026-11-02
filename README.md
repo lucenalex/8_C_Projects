@@ -22,7 +22,7 @@ Coleção de exercícios didáticos independentes em C, com um exemplo adicional
 | Verificação global de sintaxe no Linux após novas correções | **27 PASS, 0 FAIL, 2 SKIP históricos justificados, 0 avisos**; [GitHub Actions 41485112281](https://github.com/lucenalex/8_C_Projects/actions/runs/41485112281) |
 | Exercícios principais | Testes funcionais de agenda, controle acadêmico, arquivos, registros, listas encadeadas, busca/ordenação e simulador didático |
 | Seis exercícios anteriormente sem testes de execução | **6/6 cenários funcionais aprovados**; [relatório dos seis](VALIDACAO-FUNCIONAL-SEIS-PROJETOS-2026-11-02.md) |
-| Windows depois das últimas correções | Matriz do novo PR em execução/revisão; **não confundir com o resultado anterior** |
+| Windows após as correções de código desta etapa | **17/17** compilaram e linkaram novamente; [GitHub Actions 41485112296](https://github.com/lucenalex/8_C_Projects/actions/runs/41485112296) |
 | Equivalência com `.exe` antigos e execução na interface Code::Blocks | **Não comprovadas** |
 
 Dois arquivos classificados explicitamente como `SKIP` são placeholders históricos sem código-fonte executável: `main.c` (raiz, composto por bytes NUL) e `urna_eletronica/Untitled1.c` (whitespace). Eles **não foram apagados**.
