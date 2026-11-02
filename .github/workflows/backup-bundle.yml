@@ -1,0 +1,42 @@
+name: Full Git bundle snapshot (read-only)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/backup-bundle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Export Git history and verify bundle
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Create independent bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/github-backup"
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+          git show-ref > "$RUNNER_TEMP/github-backup/refs.txt"
+          git bundle create "$RUNNER_TEMP/github-backup/repository.bundle" --all
+          git bundle verify "$RUNNER_TEMP/github-backup/repository.bundle"
+          (cd "$RUNNER_TEMP/github-backup" && sha256sum repository.bundle > SHA256SUMS.txt)
+          git rev-parse HEAD > "$RUNNER_TEMP/github-backup/actions-checkout-head.txt"
+          ls -lh "$RUNNER_TEMP/github-backup/repository.bundle"
+      - name: Upload full Git bundle and checksum
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: full-git-bundle
+          path: ${{ runner.temp }}/github-backup/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
