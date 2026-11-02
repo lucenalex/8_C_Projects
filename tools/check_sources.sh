@@ -21,7 +21,15 @@ while IFS= read -r -d '' file; do
   relative=${file#"$ROOT"/}
   # Explicitly classify non-source and platform-dependent files.
   # These are not PASS and will not count as validated.
-  if [[ "$lang" == fortran && "$relative" == "temp_convertion.rtf.f08" ]] &&
+  if [[ "$lang" == c && "$relative" == "main.c" ]] &&
+     [[ "$(LC_ALL=C tr -d '\\000' < "$file" | wc -c)" -eq 0 ]]; then
+    result=SKIP_NULL_PLACEHOLDER
+    printf 'Historical placeholder: file consists exclusively of NUL bytes; source preserved.\n' > "$log"
+  elif [[ "$lang" == c && "$relative" == "urna_eletronica/Untitled1.c" ]] &&
+       [[ "$(LC_ALL=C tr -d '[:space:]' < "$file" | wc -c)" -eq 0 ]]; then
+    result=SKIP_EMPTY_PLACEHOLDER
+    printf 'Historical empty placeholder; preserved, not a compilable source.\n' > "$log"
+  elif [[ "$lang" == fortran && "$relative" == "temp_convertion.rtf.f08" ]] &&
      head -c 6 "$file" | grep -qF '{\rtf1'; then
     result=SKIP_RTF_DOCUMENT
     printf 'File is RTF, not Fortran source.\n' > "$log"
