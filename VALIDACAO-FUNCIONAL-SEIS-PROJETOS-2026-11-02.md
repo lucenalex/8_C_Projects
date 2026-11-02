@@ -16,7 +16,7 @@ A compilação de **17 projetos Code::Blocks no Windows/MinGW** foi comprovada a
 ## Evidência executada
 
 - [GitHub Actions Linux 41485112281](https://github.com/lucenalex/8_C_Projects/actions/runs/41485112281): compilação dos seis programas, testes funcionais aprovados; auditoria global de fontes com **27 PASS, 0 FAIL e 2 SKIP** (placeholders históricos); **zero avisos**.
-- A compilação Windows de 17/17 projetos da **revisão anterior** está em [41481747271](https://github.com/lucenalex/8_C_Projects/actions/runs/41481747271). A alteração atual precisa ser revalidada no Windows antes do merge.
+- A compilação Windows dos **17 projetos já com as correções desta etapa** passou no [workflow 41485112296](https://github.com/lucenalex/8_C_Projects/actions/runs/41485112296), usando GCC e GFortran UCRT64.
 - Testes C usam `-std=c11 -Werror`, UndefinedBehaviorSanitizer (UBSan) e prazo de execução; o exemplo Fortran usa `-fcheck=all`. Essa proteção **não certifica ausência de bugs**.
 
 Para reproduzir no Ubuntu com GCC, GFortran e Python 3:
