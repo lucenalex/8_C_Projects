@@ -13,6 +13,8 @@ PROJECTS = (
     "busca_linear_binaria", "gerador_nomes_aleatorios", "lista_linear_1",
     "lista_nomes_masculinos", "listas_encadeadas", "ordenacao",
     "registro_eleitores", "urna_eletronica",
+    "EDB_AULA_2022_11_09", "MinMaxFuction", "busca_binaria_1",
+    "criar_arquivo", "example", "racunho",
 )
 
 def build(name, tmp):
@@ -28,17 +30,23 @@ def build(name, tmp):
     missing = [str(p) for p in paths if not p.is_file()]
     if missing:
         raise RuntimeError("missing files: " + repr(missing))
-    sources = [p for p in paths if p.suffix.lower() == ".c"]
-    if not sources:
-        raise RuntimeError("no C source units")
+    c_sources = [p for p in paths if p.suffix.lower() == ".c"]
+    fortran_sources = [p for p in paths if p.suffix.lower() in (".f", ".for", ".f90", ".f95", ".f03", ".f08")]
+    if c_sources and fortran_sources:
+        raise RuntimeError("mixed C/Fortran project requires explicit linker policy")
+    if not c_sources and not fortran_sources:
+        raise RuntimeError("no recognized source units")
+    compiler = "gfortran" if fortran_sources else "gcc"
+    sources = fortran_sources or c_sources
+    language_standard = "-std=f2018" if fortran_sources else "-std=c11"
     exe = tmp / (name + ".exe")
-    cmd = ["gcc", "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
+    cmd = [compiler, language_standard, "-Wall", "-Wextra", "-Wpedantic", "-Werror",
            *(str(p) for p in sources), "-o", str(exe)]
     result = subprocess.run(cmd, text=True, capture_output=True, timeout=90)
     if result.returncode or not exe.exists():
         raise RuntimeError("gcc/link failed: " + result.stderr[-2200:])
     return {"project": name, "status": "PASS", "cbp": project_files[0].name,
-            "units": units, "sources": len(sources), "exe_bytes": exe.stat().st_size}
+            "units": units, "sources": len(sources), "compiler": compiler, "exe_bytes": exe.stat().st_size}
 
 def main():
     parser = argparse.ArgumentParser()
@@ -57,7 +65,7 @@ def main():
     args.report.write_text(json.dumps(results, indent=2, ensure_ascii=False)+"\n",
                            encoding="utf-8")
     passed = sum(x["status"] == "PASS" for x in results)
-    print(f"CodeBlocks UCRT64 compilations: {passed}/{len(results)} PASS")
+    print(f"CodeBlocks UCRT64 C/Fortran compilations: {passed}/{len(results)} PASS")
     if passed != len(results):
         raise SystemExit(1)
 
