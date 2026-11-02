@@ -25,7 +25,7 @@ def main():
         contains(check_run(tmp/"algos"),"PASS: 3 sort algorithms")
         print("PASS algorithms: bubble, selection, insertion, sequential & binary search")
         compile_to(tmp/"sort","ordenacao/main.c","ordenacao/algoritmos.c")
-        printout=check_run(tmp/"sort","10\n11\n3\n10\n11\n7\n10\n12\n",limit=10)
+        printout=check_run(tmp/"sort","10\n3\n11\n10\n11\n7\n12\n",limit=10)
         contains(printout,"Busca binaria exige vetor 3 ordenado","Ordenacao concluida.",
                  "Valor nao encontrado.")
         print("PASS sorting CLI: reject unsorted binary search and then sort")
@@ -38,7 +38,7 @@ def main():
                  "Tamanho apos remover 45: 1")
         print("PASS linked list: 1000 nodes, head/middle/tail, missing, duplicates")
         compile_to(tmp/"twovectors","busca_linear_binaria/main.c")
-        inp="4\n1\n8\n5\n1\n4\n6\n3\n2\n7\n5\n3\n6\n2\n6\n3\n2\n8\n1\n4\n4\n6\n6\n7\n"
+        inp="4\n1\n8\n5\n1\n4\n6\n3\n2\n7\n5\n3\n6\n2\n8\n6\n7\n3\n2\n5\n1\n4\n4\n6\n6\n7\n"
         txt=check_run(tmp/"twovectors",inp)
         contains(txt,"Preencha o vetor correspondente.","Valor encontrado na posicao",
                  "1 2 3 4 5 6 7 8")
