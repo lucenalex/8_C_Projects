@@ -30,6 +30,7 @@ jobs:
           install: >-
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gcc-fortran
       - name: Build .cbp project sources in temporary directory
         shell: msys2 {0}
         run: |
