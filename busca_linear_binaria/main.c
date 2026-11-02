@@ -1,186 +1,78 @@
-/******************************************************************************
-    Clientes:
-        Universidade Estadual do Maranhão
-        Centro de Ciências Tecnológicas
-        Departamento de Engenharia da Computação
-        Curso de Engenharia da Computação
-        Disciplina: Estrutura de Dados Básica (ASL092N321)
-        Semestre: 2022.2         Turma: 01
-        Professores:
-            Lúis Carlos Fonseca
-            Pedro Brandão Neto
-
-    Autores:
-        Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
-
-    Título: Atividade Prática
-
-    Propósito do Programa:
-
-        Crie uma programa para preencher 2 vetores: Um não ordenado e o outro
-        ordenado. Ambos com tamanho 8. Usar funções. Crie um menu de texto com
-        as seguintes opções:
-            1) Preencher vetor 1
-            2) Preencher vetor 2
-            3) Busca Sequencial (vetor 1)
-            4) Busca Binária (vetor 2)
-            5) Imprimir vetor 1
-            6) Imprimir vetor 2
-            7) Sair.
-
-    Dados de Manutenção do programa
-
-      Data            Programador                  Descrição da Mudança
-    ==========    ======================      =================================
-    2022/12/10    Alexsandro Lucena Mota      - Código original (versão 0.1).
-*******************************************************************************/
-
+/* Dois vetores de 8 elementos: busca linear e busca binaria crescente. */
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define tam 8
-
-/*****************************************************************************/
-int  menu_select();
-void preencher_vetor();
-int  busca_sequencial();
-int  busca_binaria();
-void imprimir_vetor();
-/*****************************************************************************/
-int main(){
-    printf("PROGRAMA DOIS VETORES: ORDENADO E NAO ORDENADO\n");
-    int choose = 0, *vetor1 = NULL, *vetor2 = NULL;
-    int elemento_vetor = 0, retorno = 0;
-    vetor1 = (int *) malloc(tam*sizeof(int));
-    if(vetor1 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
-    }
-    vetor2 = (int *) malloc(tam*sizeof(int));
-    if(vetor2 == NULL){ // teste de alocação de memória
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
-    }
-    for(int i = 0; i < tam; i++){
-        *(vetor1 + i) = 0;
-        *(vetor2 + i) = 0;
-    }
-    do{
-        printf("\n");
-        choose = menu_select();
-        switch(choose){
-            case 1:
-                printf("\n");
-                printf("Preencha o vetor sem se preocupar com a ordem: ");
-                preencher_vetor(vetor1);
-                break;
-            case 2:
-                printf("\n");
-                printf("Preencha o vetor de forma ordenada, ou seja, ");
-                printf("em ordem crescente ou descrescente: ");
-                preencher_vetor(vetor2);
-                break;
-            case 3:
-                printf("Informe o valor que deseja buscar: ");
-                scanf("%d",&elemento_vetor);
-                retorno = busca_sequencial(elemento_vetor,vetor1);
-                if(retorno == -1){
-                    printf("Valor nao encontrado. ");
-                    printf("Nao eh uma componente deste vetor.\n");
-                }else{
-                    printf("valor encontrado na posicao %d do vetor: ", retorno);
-                    printf("vetor[%d] = %d.\n", retorno, *(vetor1 + retorno));
-                }
-                break;
-            case 4:
-                printf("Informe o valor que deseja buscar: ");
-                scanf("%d",&elemento_vetor);
-                retorno = busca_binaria(elemento_vetor,vetor2);
-                if(retorno == -1){
-                    printf("Valor nao encontrado. ");
-                    printf("Nao eh uma componente deste vetor.\n");
-                }else{
-                    printf("valor encontrado na posicao %d do vetor: ", retorno);
-                    printf("vetor[%d] = %d.\n", retorno, *(vetor2 + retorno));
-                }
-                break;
-            case 5:
-                printf("\n");
-                printf("vetor_1 = { ");
-                imprimir_vetor(vetor1);
-                printf("}\n");
-                break;
-            case 6:
-                printf("\n");
-                printf("vetor_2 = { ");
-                imprimir_vetor(vetor2);
-                printf("}\n");
-                break;
-            case 7:
-                printf("\nVoce escolheu sair do programa.\n");
-                break; /* liberar memória antes de sair */
+#include <string.h>
+#define TAM 8
+static int numero(const char *rotulo,int *out) {
+    char buf[128],*fim;
+    for(;;){
+        fputs(rotulo,stdout);fflush(stdout);
+        if(!fgets(buf,sizeof buf,stdin))return 0;
+        size_t n=strcspn(buf,"\n");
+        if(buf[n]!='\n'&&!feof(stdin)) {
+            int c;while((c=getchar())!='\n'&&c!=EOF){}
+            puts("Entrada muito longa.");continue;
         }
-    }while(choose != 7);
-    free(vetor1);
-    free(vetor2);
+        errno=0;long v=strtol(buf,&fim,10);
+        while(*fim=='\n'||*fim=='\r'||*fim==' '||*fim=='\t')++fim;
+        if(fim==buf||*fim||errno||v<INT_MIN||v>INT_MAX){
+            puts("Numero invalido.");continue;
+        }
+        *out=(int)v;return 1;
+    }
+}
+static int cmp(const void *a,const void *b){
+    int x=*(const int*)a,y=*(const int*)b;
+    return (x>y)-(x<y);
+}
+static int linear(const int *v,int alvo){
+    for(int i=0;i<TAM;++i)if(v[i]==alvo)return i;
+    return -1;
+}
+static int binaria(const int *v,int alvo) {
+    int baixo=0,alto=TAM;
+    while(baixo<alto) {
+        int meio=baixo+(alto-baixo)/2;
+        if(v[meio]<alvo)baixo=meio+1;
+        else alto=meio;
+    }
+    return baixo<TAM&&v[baixo]==alvo?baixo:-1;
+}
+static int preencher(int *v,int ordenar) {
+    for(int i=0;i<TAM;++i) {
+        char prompt[40];snprintf(prompt,sizeof prompt,"Elemento %d: ",i+1);
+        if(!numero(prompt,&v[i]))return 0;
+    }
+    if(ordenar)qsort(v,TAM,sizeof v[0],cmp);
+    return 1;
+}
+static void mostrar(const int *v){
+    for(int i=0;i<TAM;++i)printf("%d%s",v[i],i==TAM-1?"\n":" ");
+}
+int main(void){
+    int v1[TAM]={0},v2[TAM]={0},p1=0,p2=0,op,alvo,idx;
+    for(;;){
+        puts("1 Preencher desordenado | 2 Preencher ordenado | 3 Busca linear");
+        puts("4 Busca binaria | 5 Mostrar 1 | 6 Mostrar 2 | 7 Sair");
+        if(!numero("Opcao: ",&op)||op==7)break;
+        switch(op){
+            case 1:if(!preencher(v1,0))return 0;p1=1;break;
+            case 2:if(!preencher(v2,1))return 0;p2=1;break;
+            case 3:case 4:
+                if((op==3&&!p1)||(op==4&&!p2)) {
+                    puts("Preencha o vetor correspondente.");break;
+                }
+                if(!numero("Valor procurado: ",&alvo))return 0;
+                idx=op==3?linear(v1,alvo):binaria(v2,alvo);
+                if(idx<0)puts("Nao encontrado.");
+                else printf("Valor encontrado na posicao %d\n",idx);
+                break;
+            case 5:if(p1)mostrar(v1);else puts("Preencha o vetor 1.");break;
+            case 6:if(p2)mostrar(v2);else puts("Preencha o vetor 2.");break;
+            default:puts("Opcao invalida.");
+        }
+    }
     return 0;
 }
-/*****************************************************************************/
-int menu_select(){
-    int ch = 0;
-    do{
-        printf("Menu de Opcoes\n");
-        printf("\t1 - Preencher vetor 1 (Desordenado)\n");
-        printf("\t2 - Preencher vetor 2 (Ordenado)\n");
-        printf("\t3 - Busca Sequencial (vetor 1)\n");
-        printf("\t4 - Busca Binária (vetor 2)\n");
-        printf("\t5 - Imprimir vetor 1\n");
-        printf("\t6 - Imprimir vetor 2\n");
-        printf("\t7 - Sair.\n");
-        printf("Entre com a opcao desejada: ");
-        if (scanf("%d", &ch) != 1) return 7; /* EOF encerra o menu */
-        if((ch < 1) || (ch > 7)){
-            printf("\nOpcao Invalida! Tente novamente.\n");
-        }
-    }while( (ch < 1) || (ch > 7) );
-    return ch;
-}
-/*---------------------------------------------------------------------------*/
-void preencher_vetor(int *vetor){
-    for(int i = 0; i < tam; i++){
-        scanf("%d",vetor + i);
-    }
-};
-/*---------------------------------------------------------------------------*/
-int busca_sequencial(int valor, int *vetor){
-    printf("\n");
-    for(int i = 0; i < tam; i++){
-        if(valor == *(vetor + i)){
-            return i;
-        }
-    }
-    return -1;
-};
-/*---------------------------------------------------------------------------*/
-int busca_binaria(int valor,int *vetor){
-    printf("\n");
-    int inicio = 0, fim = tam - 1, pmedia = 0;
-    do{
-        pmedia = (fim + inicio)/2;
-        if(valor == *(vetor + pmedia)){
-            return pmedia;
-        }else if(valor < *(vetor + pmedia)){
-            fim = pmedia - 1;
-        }else{
-            inicio = pmedia + 1;
-        }
-    }while(inicio <= fim);
-    return -1;
-};
-/*---------------------------------------------------------------------------*/
-void imprimir_vetor(int *vetor){
-    for(int i = 0; i < tam; i++){
-        printf("%d ",*(vetor + i));
-    }
-};
-/*---------------------------------------------------------------------------*/
