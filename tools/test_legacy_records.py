@@ -31,7 +31,7 @@ def ensure(text, *expected):
 def compile_all(tempdir):
     binaries = {}
     for name, source in SOURCES.items():
-        binary = tempdir / name
+        binary = tempdir / f'program_{name}'
         cmd = ["gcc", "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
                "-g", "-fsanitize=undefined", "-fno-sanitize-recover=all",
                str(ROOT / source), "-o", str(binary)]
