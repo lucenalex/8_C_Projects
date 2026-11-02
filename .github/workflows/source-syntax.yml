@@ -7,6 +7,7 @@ on:
       - 'tools/check_sources.sh'
       - 'tools/test_legacy_records.py'
       - 'tools/test_search_sort_lists.py'
+      - 'tools/test_six_legacy_projects.py'
       - 'urna_eletronica/tests/test_cli.py'
       - 'urna_eletronica/tools/test_urna.sh'
       - '**/*.c'
@@ -63,6 +64,9 @@ jobs:
       - name: Verify fictional educational voting simulator
         shell: bash
         run: bash urna_eletronica/tools/test_urna.sh
+      - name: Verify six remaining legacy exercises with test-only inputs
+        shell: bash
+        run: python3 tools/test_six_legacy_projects.py
       - name: Report totals
         if: always()
         shell: bash
