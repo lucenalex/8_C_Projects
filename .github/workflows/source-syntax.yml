@@ -5,6 +5,7 @@ on:
     paths:
       - '.github/workflows/source-syntax.yml'
       - 'tools/check_sources.sh'
+      - 'tools/test_legacy_records.py'
       - '**/*.c'
       - '**/*.f'
       - '**/*.for'
@@ -50,6 +51,9 @@ jobs:
       - name: Verify agenda (unit, capacity and CLI boundary cases)
         shell: bash
         run: bash EDB_SL2_Desafio_1/tools/test_agenda.sh
+      - name: Verify record/list/file I/O programs with isolated synthetic data
+        shell: bash
+        run: python3 tools/test_legacy_records.py
       - name: Report totals
         if: always()
         shell: bash
