@@ -347,7 +347,7 @@ void imprimir_vetor(int *vetor,int dim){
         printf("%d ",*(vetor + i));
     }
     printf("\n");
-};
+}
 /******************************************************************************/
 void bublesort(int *vetor, int dim){// Ordenação por troca
     for(int i = 0; i < dim; i++){
