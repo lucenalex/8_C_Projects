@@ -6,6 +6,7 @@ on:
       - '.github/workflows/source-syntax.yml'
       - 'tools/check_sources.sh'
       - 'tools/test_legacy_records.py'
+      - 'tools/test_search_sort_lists.py'
       - '**/*.c'
       - '**/*.f'
       - '**/*.for'
@@ -54,6 +55,9 @@ jobs:
       - name: Verify record/list/file I/O programs with isolated synthetic data
         shell: bash
         run: python3 tools/test_legacy_records.py
+      - name: Test search, sort and linked structures
+        shell: bash
+        run: python3 tools/test_search_sort_lists.py
       - name: Report totals
         if: always()
         shell: bash
