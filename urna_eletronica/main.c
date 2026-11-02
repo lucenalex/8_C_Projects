@@ -1,50 +1,51 @@
 /*******************************************************************************
 Clientes:
-    Universidade Estadual do Maranh„o
-    Centro de CiÍncias TecnolÛgicas
-    Departamento de Engenharia da ComputaÁ„o
-    Curso de Engenharia da ComputaÁ„o
-    Disciplina: Estrutura de Dados B·sica (ASL092N321)
+    Universidade Estadual do Maranh√£o
+    Centro de Ci√™ncias Tecnol√≥gicas
+    Departamento de Engenharia da Computa√ß√£o
+    Curso de Engenharia da Computa√ß√£o
+    Disciplina: Estrutura de Dados B√°sica (ASL092N321)
     Semestre: 2022.2         Turma: 01
     Professores:
-        L˙is Carlos Fonseca
-        Pedro Brand„o Neto
+        L√∫is Carlos Fonseca
+        Pedro Brand√£o Neto
 
     Autores:
         Alunos:
-            Alexsandro Lucena Mota   CÛdigo: 20210024710
+            Alexsandro Lucena Mota   C√≥digo: 20210024710
 
-PROVA PR¡TICA DE ESTRUTURA DE DADOS (AVALIA«√O 1):
-TÕTULO: URNA ELETR‘NICA		DATA DE ENTREGA: 05/11/2022
+PROVA PR√ÅTICA DE ESTRUTURA DE DADOS (AVALIA√á√ÉO 1):
+T√çTULO: URNA ELETR√îNICA		DATA DE ENTREGA: 05/11/2022
 
-PropÛsito do Programa: ImplementaÁ„o de uma URNA ELETR‘NICA em C.
+Prop√≥sito do Programa: Implementa√ß√£o de uma URNA ELETR√îNICA em C.
 
 Inicialmente usando um registro de eleitores e outro de candidatos com struct,
-sendo as mesmas din‚micas (isto È, fazendo uso de lista encadeada), forneÁa as
-funÁıes de inserÁ„o e exclus„o. Em seguida desenvolva uma funÁ„o para a votaÁ„o
-fazendo uso de um registro de votos. Existir„o pelo menos 20 candidatos a
-vereador a serem distribuÌdos nos seguintes partidos: PBA, PBB, PBC, PBD e PBE.
-Um eleitor poder· votar em um candidato cadastrado mas primeiro ele informar· na
-urna o seu cÛdigo e depois o n˙mero do candidato desejado. Ao buscar um
-candidato ou eleitor aplique a busca bin·ria. Utilize um menu de opÁıes.
+sendo as mesmas din√¢micas (isto √©, fazendo uso de lista encadeada), forne√ßa as
+fun√ß√µes de inser√ß√£o e exclus√£o. Em seguida desenvolva uma fun√ß√£o para a vota√ß√£o
+fazendo uso de um registro de votos. Existir√£o pelo menos 20 candidatos a
+vereador a serem distribu√≠dos nos seguintes partidos: PBA, PBB, PBC, PBD e PBE.
+Um eleitor poder√° votar em um candidato cadastrado mas primeiro ele informar√° na
+urna o seu c√≥digo e depois o n√∫mero do candidato desejado. Ao buscar um
+candidato ou eleitor aplique a busca bin√°ria. Utilize um menu de op√ß√µes.
 Finalmente, usando o registro RESULTADO montar um lista cotendo os candidatos
-por ordem descendente de votos e tambÈm dos partidos. Salve as informaÁıes do
+por ordem descendente de votos e tamb√©m dos partidos. Salve as informa√ß√µes do
 registro dos eleitores em um arquivo com pelo menos 200 eleitores.
 
-Dados de ManutenÁ„o do programa
+Dados de Manuten√ß√£o do programa
 
-Data          Programador                 DescriÁ„o da MudanÁa
+Data          Programador                 Descri√ß√£o da Mudan√ßa
 ==========    ======================      =================================
-2022/13/10    Alexsandro Lucena Mota      - CÛdigo original (vers„o 0.1).
+2022/13/10    Alexsandro Lucena Mota      - C√≥digo original (vers√£o 0.1).
 *******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> /* declara√ß√£o de strcpy, usado no prot√≥tipo */
 #include <locale.h>
 /******************************************************************************/
 /**> Inicialmente, com struct:
      - 1 registro de eleitores;
      - 1 resgistro de candidatos
-     fornecer as funÁıes de inserÁ„o e exclus„o. <**/
+     fornecer as fun√ß√µes de inser√ß√£o e exclus√£o. <**/
 
 /**> Estrutura para registro de eleitores e candidatos <**/
 typedef struct no{
@@ -54,27 +55,28 @@ typedef struct no{
     struct no *proximo;
 }registro;
 /******************************************************************************/
-/**> criaÁ„o: retorna um registro vazio <**/
+/**> cria√ß√£o: retorna um registro vazio <**/
 registro *criar_registro(){
     return NULL;
 };
 //----------------------------------------------------------------------------//
-/**> vazia: retorna 1 se o registro est· vazia, do contr·rio 0 <**/
+/**> vazia: retorna 1 se o registro est√° vazia, do contr√°rio 0 <**/
 int vazia(registro *reg){
     return (reg == NULL);
 };
 //----------------------------------------------------------------------------//
-/**> inserÁ„o: retorna registro atualizado <**/
+/**> inser√ß√£o: retorna registro atualizado <**/
 registro *insercao(registro *reg, int codigo, char name[], char partido[]){
     registro *novo = (registro*) calloc(1,sizeof(registro));
+    if (!novo) { fputs("Sem mem√≥ria.\n", stderr); return reg; }
     novo->id = codigo;
-    strcpy(novo->nome,name);
-    strcpy(novo->filiacao,partido);
+    snprintf(novo->nome, sizeof novo->nome, "%s", name);
+    snprintf(novo->filiacao, sizeof novo->filiacao, "%s", partido);
     novo->proximo = reg;
     return novo;
 };
 //---------------------------------------------------------------------------//
-/**> exclus„o: exclui um membro do registro <**/
+/**> exclus√£o: exclui um membro do registro <**/
 registro* exclusao(registro *reg, int cod){
     registro *anterior = NULL;  /**> ponteiro para o membro anterior <**/
     registro *percorre = reg; /**> ponteiro para percorrer o registro <**/
@@ -85,7 +87,7 @@ registro* exclusao(registro *reg, int cod){
     }
     /**> verifica se achou o membro <**/
     if(percorre == NULL){
-        return reg; /**> n„o achou: retorna registro original <**/
+        return reg; /**> n√£o achou: retorna registro original <**/
     }
     /**> retira o elemento <**/
     if(anterior == NULL){
@@ -112,7 +114,7 @@ void imprime_registro(registro *reg){
 /******************************************************************************/
 int main(){
     setlocale(LC_ALL,"pbr");
-    /** declara registros de candidatos e eleitores n„o inicializados*/
+    /** declara registros de candidatos e eleitores n√£o inicializados*/
     registro *candidatos;
     registro *eleitores;
     /** cria e inicializa registros vazios */
@@ -121,19 +123,19 @@ int main(){
 /**
 
 Em seguida:
-    - 1 funÁ„o para a votaÁ„o fazendo uso de um registro de votos.
-      Existir„o pelo menos 20 candidatos a vereador a serem distribuÌdos nos
+    - 1 fun√ß√£o para a vota√ß√£o fazendo uso de um registro de votos.
+      Existir√£o pelo menos 20 candidatos a vereador a serem distribu√≠dos nos
     seguintes partidos: PBA, PBB, PBC, PBD e PBE.
-    - 1 eleitor poder· votar em um candidato cadastrado mas primeiro ele
-    informar· na urna o seu cÛdigo e depois o n˙mero do candidato desejado.
+    - 1 eleitor poder√° votar em um candidato cadastrado mas primeiro ele
+    informar√° na urna o seu c√≥digo e depois o n√∫mero do candidato desejado.
 
-    Ao buscar um candidato ou eleitor aplique a busca bin·ria.
-    Utilize um menu de opÁıes.
+    Ao buscar um candidato ou eleitor aplique a busca bin√°ria.
+    Utilize um menu de op√ß√µes.
 
     Finalmente, usando o registro RESULTADO montar um lista cotendo os
-    candidatos por ordem descendente de votos e tambÈm dos partidos.
+    candidatos por ordem descendente de votos e tamb√©m dos partidos.
 
-    Salve as informaÁıes do registro dos eleitores em um arquivo com
+    Salve as informa√ß√µes do registro dos eleitores em um arquivo com
     pelo menos 200 eleitores.*/
     return 0;
 }

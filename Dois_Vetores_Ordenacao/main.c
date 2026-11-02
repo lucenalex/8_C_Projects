@@ -1,294 +1,90 @@
-// Bibliotecas Utilizadas
-#include <stdio.h> // Para entrada e saída padrões
-#include <stdlib.h> // Biblioteca padrão
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <locale.h>
-#define tam 3
-// Dados de Produção
-/**
-    Clientes:
-        Universidade Estadual do Maranhão
-        Centro de Ciências Tecnológicas
-        Departamento de Engenharia da Computação
-        Curso de Engenharia da Computação
-        Disciplina: Estrutura de Dados Básica (ASL092N321)
-        Semestre: 2022.2         Turma: 01
-        Professores:
-            Lúis Carlos Fonseca
-            Pedro Brandão Neto
 
-    Autores:
-        Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
-
-    Propósito do Programa:
-
-        Crie uma programa para preencher 2 vetores: Um não ordenado e o outro
-		ordenado. Ambos com tamanho 8. Usar funções. Crie um  menu  de  texto
-		com as seguintes opções:
-			1)Preencher vetor 1
-			2)Preencher vetor 2
-			3)Busca Sequencial (vetor 1)
-			4)Busca Binária (vetor 2)
-			5)Imprimir vetor 1
-			6)Imprimir vetor 2
-			7)Sair
-
-    Dados de Manutenção do programa
-
-      Data            Programador                  Descrição da Mudança
-    ========    ======================      =================================
-    2022/4/17    Alexsandro Lucena Mota      - Código original (versão 0.1).
-
-*/
-
-// Declaração de Variáveis Globais e/ou Novos tipos.
-
-// Lista de Protótipos de Funções e Procedimentos
-int media_das_Medias();
-
-// Escopo da Função Main
-int main(){
-    setlocale(LC_ALL,"ptb");
-    // Apresentação do programa ao usuário
-    printf("PROGRAMA DOIS VETORES\n\n");
-    printf("Propósito:\n");
-    printf("\tpreencher 2 vetores de tamanho 8: um ordenado e o outro não.\n");
-
-    /*
-		printf("tamanho to tipo char: %lld\n", sizeof(char));
-		printf("tamanho to tipo float: %lld\n", sizeof(float));
-		printf("tamanho to tipo tp_disc: %lld\n", sizeof(tp_disc));
-		printf("tamanho to tipo tp_alunos: %lld\n", sizeof(tp_alunos));
-    */
-
-    // Entrada de dados
-    int opcao = 0, indice = 0; // incializa a variável opcao e indice com valor 0.
-    tp_alunos *aluno = NULL; // ponteiro para novos alunos
-        aluno = malloc(sizeof(tp_alunos));
-    //(aluno + i).disciplina = malloc(3*sizeof(tp_disc));
-    if(aluno == NULL){
-        printf("Erro: Memória Insuficiente!\n");
-        exit(1);
+/* Atividade original: dois vetores de oito elementos e buscas.
+ * A versÃ£o anterior continha estruturas de cadastro, alheias ao enunciado.
+ * CÃ³digo didÃ¡tico: valores ordenados crescentemente antes da busca binÃ¡ria.
+ */
+#define TAM 8
+static int ler_inteiro(const char *mensagem, int *valor) {
+    char linha[128], *fim;
+    long v;
+    for (;;) {
+        fputs(mensagem, stdout);
+        if (!fgets(linha, sizeof linha, stdin)) return 0;
+        errno = 0;
+        v = strtol(linha, &fim, 10);
+        while (isspace((unsigned char)*fim)) fim++;
+        if (errno == 0 && fim != linha && *fim == '\0' && v >= INT_MIN && v <= INT_MAX) {
+            *valor = (int)v;
+            return 1;
+        }
+        puts("Entrada invÃ¡lida: informe um nÃºmero inteiro.");
     }
-    for(int i = 0; i < tam; i++ ){
-        for(int j = 0; j < 3; j++){
-            (aluno + i)->disciplina[j].media = 0.;
+}
+
+static int comparar(const void *a, const void *b) {
+    int x = *(const int*)a, y = *(const int*)b;
+    return (x > y) - (x < y);
+}
+static int preencher(int vetor[TAM], int ordenado) {
+    for (int i = 0; i < TAM; ++i) {
+        char pergunta[80];
+        snprintf(pergunta, sizeof pergunta, "Elemento %d/%d: ", i + 1, TAM);
+        if (!ler_inteiro(pergunta, &vetor[i])) return 0;
+    }
+    if (ordenado) qsort(vetor, TAM, sizeof vetor[0], comparar);
+    return 1;
+}
+static int busca_sequencial(const int vetor[TAM], int alvo) {
+    for (int i = 0; i < TAM; ++i) if (vetor[i] == alvo) return i;
+    return -1;
+}
+static int busca_binaria(const int vetor[TAM], int alvo) {
+    int esquerda = 0, direita = TAM - 1;
+    while (esquerda <= direita) {
+        int meio = esquerda + (direita - esquerda) / 2;
+        if (vetor[meio] == alvo) return meio;
+        if (vetor[meio] < alvo) esquerda = meio + 1;
+        else direita = meio - 1;
+    }
+    return -1;
+}
+static void imprimir(const int vetor[TAM]) {
+    putchar('{');
+    for (int i = 0; i < TAM; ++i) printf("%s%d", i ? ", " : "", vetor[i]);
+    puts("}");
+}
+int main(void) {
+    int vetor1[TAM] = {0}, vetor2[TAM] = {0};
+    int pronto1 = 0, pronto2 = 0, opcao, alvo, pos;
+    puts("Dois vetores: busca sequencial e binÃ¡ria.");
+    for (;;) {
+        puts("1 Preencher vetor 1 | 2 Preencher vetor 2 | 3 Busca sequencial");
+        puts("4 Busca binÃ¡ria | 5 Imprimir vetor 1 | 6 Imprimir vetor 2 | 7 Sair");
+        if (!ler_inteiro("OpÃ§Ã£o: ", &opcao)) return 0;
+        switch (opcao) {
+            case 1: if (!preencher(vetor1, 0)) return 0; pronto1 = 1; break;
+            case 2: if (!preencher(vetor2, 1)) return 0; pronto2 = 1; break;
+            case 3:
+            case 4:
+                if ((opcao == 3 && !pronto1) || (opcao == 4 && !pronto2)) {
+                    puts("Preencha primeiro o vetor correspondente.");
+                    break;
+                }
+                if (!ler_inteiro("Valor a buscar: ", &alvo)) return 0;
+                pos = (opcao == 3) ? busca_sequencial(vetor1, alvo) : busca_binaria(vetor2, alvo);
+                if (pos < 0) puts("Valor nÃ£o encontrado.");
+                else printf("Valor %d encontrado na posiÃ§Ã£o %d (Ã­ndice comeÃ§ando em zero).\n", alvo, pos);
+                break;
+            case 5: if (pronto1) imprimir(vetor1); else puts("Vetor 1 vazio."); break;
+            case 6: if (pronto2) imprimir(vetor2); else puts("Vetor 2 vazio."); break;
+            case 7: return 0;
+            default: puts("OpÃ§Ã£o invÃ¡lida.");
         }
     }
-    // Cadastramento de Alunos
-    do{ // o usuário poderá informar até tam alunos no cadastro
-        printf("Deseja Cadastrar um novo aluno?\n");
-        printf("\t1 - Sim \t2-Não\n");
-        printf("Informe a opção escolhida: ");
-        scanf("%d", &opcao); // usuário informa a opção escolhida.
-        getchar(); // limpa o buffer do teclado
-        if( (opcao < 1) || (opcao > 2)){ /*> Para inválidar outros valores
-                                            que não sejam 1 ou 2.
-                                         */
-            printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-        }else if( (opcao == 1) ){ // Em caso de 1, cadastrar o aluno
-            printf("\n");
-            if( indice == tam){ // Para impedir o número tam de alunos seja estourado
-                printf("Não é possível incluir novos alunos!\n");
-                printf("Limite máximo excedito!\n");
-                system("pause");
-                printf("Pressione qualquer tecla para sair do cadastro.\n");
-                opcao = 2;
-            }else{ //Cadastrar nome do aluno e assoicar uma matricula
-                printf("Informe o nome: ");
-                gets((aluno + indice)->nome);
-                (aluno + indice)->matricula = indice + 1;
-                printf("Aluno matriculado com sucesso!\n");
-                printf("Matricula nº. %d.\n\n",(aluno + indice)->matricula);
-
-                //Matricula de alunos em disciplinas
-                printf("Deseja realizar a matricula deste aluno em disciplinas?\n");
-                printf("\t1 - Sim \t2-Não\n");
-                printf("Informe a opção escolhida: ");
-                int opmat = 0;
-                scanf("%d",&opmat);
-                do{
-                    if( (opmat < 1 ) || (opmat > 2) ){ // Evita que usuário digite um
-                            // valor idesejado.
-                        printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                    }else if( opmat == 1){// Apresenta a lista de disciplinas disponíveis
-                        printf("\n");
-                        printf("Lista de disciplinas disponíveis para matricula:\n");
-                        printf("1 - Programação Orientada a Objetos (POO);\n");
-                        printf("2 - Arquitetura e Organização de Computadores (AOC);\n");
-                        printf("3 - Matemática Discreta (MATDISC).\n\n");
-                        int quant_disc = 0; // Para número de disciplinas a se matricular
-                        do{
-                            printf("Informe em quantas disciplinas deseja se matricular: ");
-                            scanf("%d", &quant_disc);
-                            if( (quant_disc < 1) || (quant_disc > 3) ){
-                                printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                            }
-                        }while((quant_disc < 1) || (quant_disc > 3));
-                        int cod_disc = 0;
-                        for(int j = 0; j < quant_disc; j++){
-                            printf("Digite o código da disciplina: ");
-                            scanf("%d",&cod_disc);
-                            if(cod_disc == 1){
-                                strcpy( (aluno + j)->disciplina[cod_disc].nome_disc,"POO");
-                            }else if(cod_disc == 2){
-                                strcpy( (aluno + j)->disciplina[cod_disc].nome_disc,"AOC");
-                            }else if(cod_disc == 3){
-                                strcpy( (aluno + j)->disciplina[cod_disc].nome_disc,"MATDISC");
-                            }
-                        }
-                        printf("\n");
-                        opmat = 2;
-                    }else if( opmat == 2){} // Em caso de 2, sair sem fazer nada.
-                }while(opmat != 2);
-                indice++; // pós-incremento do indice.
-            }
-        }else if( (opcao == 2) ){} // Em caso de 2, sair sem fazer nada.
-    }while(opcao != 2);
-    printf("\n");
-    // Informar Boletim, Médias ou Sair do Programa
-    //  A - Tomada de Decisão
-    printf("Informe o que deseja fazer:\n");
-    do{
-        printf("\t1 - Visualizar Boletim \t2 - Sair do Progrma\n");
-        printf("Informe a opção escolhida: ");
-        scanf("%d",&opcao);
-        if( (opcao < 1) || (opcao > 2)){ /*> Para inválidar outros valores
-                                            que não sejam 1 ou 2.
-                                         */
-            printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-        }else if( (opcao == 1) ){ // Visualizar Boletim
-            int opdisc = 0;
-            do{
-                printf("Qual disciplina deseja visulizar o Boletim:\n");
-                printf("\t1 - POO \t2 - AOC \t3 - MATDISC\n");
-                printf("Informe a opção escolhida: ");
-                scanf("%d",&opdisc);
-                if((opdisc < 1) || (opdisc >3)){
-                    printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                }
-            }while( (opdisc < 1) || (opdisc >3));
-            if(opdisc == 1){
-                printf("\n");
-                printf("Boletim da disciplina POO\n\n");
-                for(int j = 0; j < indice; j++){
-                    printf("Matricula: %d",(aluno + j)->matricula);
-                    printf("\tNome: %s",(aluno + j)->nome);
-                    printf("\tMédia: %.2f\n",(aluno + j)->disciplina[1].media);
-                }
-                printf("\n");
-                int opmd = 0;
-                printf("Deseja informar a média dos alunos?\n");
-                do{
-                    printf("\t1 - Sim \t2 - Não\n");
-                    scanf("%d",&opmd);
-                    if( (opmd < 1) || (opmd > 2) ){
-                        printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                        printf("\n\n\tODigite uma opção VÁLIDA!\n");
-                    }
-                }while((opmd < 1) || (opmd > 2));
-                int opmt = 0;
-                int dig_md = 0;
-                if(opmd == 1){
-                    do{
-                        printf("Informe a matricula do aluno: ");
-                        scanf("%d",&opmt);
-                        for(int k = 0; k < indice; k++){
-                            if( opmt == (aluno + k)->matricula){
-                                printf("\n");
-                                printf("Informe a média do aluno: ");
-                                scanf("%f",&(aluno + k)->disciplina[1].media);
-                            }
-                        }
-                        getchar();
-                        printf("\n");
-                        printf("Continuar digitando médias para esta disciplina?\n");
-                        printf("\t1 - Sim \t2 - Não\n");
-                        printf("Informe a escolha: ");
-                        scanf("%d",&dig_md);
-                    }while(dig_md != 2);
-                }else if(opmd == 2){}
-            }else if(opdisc == 2){
-                printf("\n");
-                printf("Boletim da disciplina AOC\n\n");
-                for(int j = 0; j < indice; j++){
-                    printf("Matricual: %d",(aluno + j)->matricula);
-                    printf("\tNome: %s",(aluno + j)->nome);
-                    printf("\tMédia: %.2f\n",(aluno + j)->disciplina[2].media);
-                }
-                printf("\n");
-                int opmd = 0;
-                printf("Deseja informar a média dos alunos?\n");
-                do{
-                    printf("\t1 - Sim \t2 - Não\n");
-                    scanf("%d",&opmd);
-                    if( (opmd < 1) || (opmd > 2) ){
-                        printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                        printf("\n\n\tODigite uma opção VÁLIDA!\n");
-                    }
-                }while((opmd < 1) || (opmd > 2));
-                int opmt = 0;
-                int dig_md = 0;
-                if(opmd == 1){
-                    do{
-                        printf("Informe a matricula do aluno: ");
-                        scanf("%d",&opmt);
-                        for(int k = 0; k < indice; k++){
-                            if( opmt == (aluno + k)->matricula){
-                                scanf("%f",&(aluno + k)->disciplina[2].media);
-                            }
-                        }
-                        getchar();
-                        printf("\n");
-                        printf("Continuar digitando médias para esta disciplina?\n");
-                        printf("\t1 - Sim \t2 - Não\n");
-                        printf("Informe a escolha: ");
-                        scanf("%d",&dig_md);
-                    }while(dig_md != 2);
-                }else if(opmd == 2){}
-            }if(opdisc == 3){
-                printf("\n");
-                printf("Boletim da disciplina MATDISC\n\n");
-                for(int j = 0; j < indice; j++){
-                    printf("Matricula: %d",(aluno + j)->matricula);
-                    printf("\tNome: %s",(aluno + j)->nome);
-                    printf("\tMédia: %.2f\n",(aluno + j)->disciplina[3].media);
-                }
-                printf("\n");
-                int opmd = 0;
-                printf("Deseja informar a média dos alunos?\n");
-                do{
-                    printf("\t1 - Sim \t2 - Não\n");
-                    scanf("%d",&opmd);
-                    if( (opmd < 1) || (opmd > 2) ){
-                        printf("\n\n\tOPÇÃO INVÁLIDA!\n");
-                        printf("\n\n\tODigite uma opção VÁLIDA!\n");
-                    }
-                }while((opmd < 1) || (opmd > 2));
-                int opmt = 0;
-                int dig_md = 0;
-                if(opmd == 1){
-                    do{
-                        printf("Informe a matricula do aluno: ");
-                        scanf("%d",&opmt);
-                        for(int k = 0; k < indice; k++){
-                            if( opmt == (aluno + k)->matricula ){
-                                scanf("%f",&(aluno + k)->disciplina[3].media);
-                            }
-                        }
-                        printf("\n");
-                        printf("Continuar digitando médias para esta disciplina?\n");
-                        printf("\t1 - Sim \t2 - Não\n");
-                        printf("Informe a escolha: ");
-                        getchar();
-                        scanf("%d",&dig_md);
-                    }while(dig_md != 2);
-                }else if(opmd == 2){}
-            }
-        }else if( opcao == 2){
-            opcao = 2;
-        }
-    }while(opcao != 2);
-    return 0;
 }

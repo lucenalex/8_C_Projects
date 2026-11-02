@@ -1,11 +1,11 @@
 /**
 Lista encadeada:
-- sequência encadeada de elementos, chamados de nós da lista
-- nó da lista é representado por dois campos:
-  -> a informação armazenada e
-  -> o ponteiro para o próximo elemento da lista
-- a lista é representada por um ponteiro para o primeiro nó
-- o ponteiro do último elemento é NULL
+- sequÃªncia encadeada de elementos, chamados de nÃ³s da lista
+- nÃ³ da lista Ã© representado por dois campos:
+  -> a informaÃ§Ã£o armazenada e
+  -> o ponteiro para o prÃ³ximo elemento da lista
+- a lista Ã© representada por um ponteiro para o primeiro nÃ³
+- o ponteiro do Ãºltimo elemento Ã© NULL
 
 */
 /******************************************************************************/
@@ -17,15 +17,15 @@ typedef struct no{
     struct no *proximo;
 }Lista;
 /******************************************************************************/
-Lista *criarlista(){//função de criação: retorna uma lista vazia
+Lista *criarlista(){//funÃ§Ã£o de criaÃ§Ã£o: retorna uma lista vazia
     return NULL;
 };
 /**---------------------------------------------------------------------------*/
-int vazia(Lista *lista){//função vazia: retorna 1 se vazia, do contrário 0
+int vazia(Lista *lista){//funÃ§Ã£o vazia: retorna 1 se vazia, do contrÃ¡rio 0
     return (lista == NULL);
 };
 /**---------------------------------------------------------------------------*/
-Lista *insere(Lista *lista, int valor){//inserção: retorna lista atualizada
+Lista *insere(Lista *lista, int valor){//inserÃ§Ã£o: retorna lista atualizada
     Lista *novo = (Lista*) calloc(1,sizeof(Lista));
     novo->informacao = valor;
     novo->proximo = lista;
@@ -39,9 +39,9 @@ void imprime_lista(Lista *lista){// imprime os elementos da lista
     }
 }
 /**---------------------------------------------------------------------------*/
-busca(Lista *lista, int valor);
+/* Busca: protÃ³tipo nÃ£o implementado no exemplo original. */
 /**---------------------------------------------------------------------------*/
-listagem(Lista *lista);
+/* Listagem: usar imprime_lista(). */
 /**---------------------------------------------------------------------------*/
 Lista* retira(Lista *lista, int valor){
     Lista* ant = NULL; // ponteiro para o elemento anterior
@@ -53,7 +53,7 @@ Lista* retira(Lista *lista, int valor){
     }
     // verifica se achou o elemento
     if(p==NULL){
-        return lista;// não achou: retorna a lista original
+        return lista;// nÃ£o achou: retorna a lista original
     }
     // retira o elemento
     if(ant == NULL){
@@ -69,11 +69,12 @@ Lista* retira(Lista *lista, int valor){
 };
 /******************************************************************************/
 int main(void){
-    Lista *_lista;                      /** declara uma lista não inicializada*/
+    Lista *_lista;                      /** declara uma lista nÃ£o inicializada*/
     _lista = criarlista();              /** cria e inicializa uma lista vazia */
     _lista = insere(_lista,23);         /** insere na lista o elemento 23     */
     _lista = insere(_lista,45);         /** insere na lista o elemento 45     */
     imprime_lista(_lista);
+    while (_lista != NULL) _lista = retira(_lista, _lista->informacao);
     return 0;
 }
 /******************************************************************************/
