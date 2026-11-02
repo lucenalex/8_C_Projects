@@ -22,7 +22,7 @@ while IFS= read -r -d '' file; do
   # Explicitly classify non-source and platform-dependent files.
   # These are not PASS and will not count as validated.
   if [[ "$lang" == c && "$relative" == "main.c" ]] &&
-     [[ "$(LC_ALL=C tr -d '\\000' < "$file" | wc -c)" -eq 0 ]]; then
+     [[ "$(LC_ALL=C tr -d '\000' < "$file" | wc -c)" -eq 0 ]]; then
     result=SKIP_NULL_PLACEHOLDER
     printf 'Historical placeholder: file consists exclusively of NUL bytes; source preserved.\n' > "$log"
   elif [[ "$lang" == c && "$relative" == "urna_eletronica/Untitled1.c" ]] &&
