@@ -43,6 +43,10 @@ jobs:
           echo "exit_code=$status" >> "$GITHUB_OUTPUT"
           test -s "$RUNNER_TEMP/source-audit/results.csv"
           test "$status" -eq 0
+      - name: Run bounded regression tests for corrected examples
+        if: always()
+        shell: bash
+        run: bash tools/smoke_tests.sh
       - name: Report totals
         if: always()
         shell: bash
