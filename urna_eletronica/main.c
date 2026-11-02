@@ -1,142 +1,76 @@
-/*******************************************************************************
-Clientes:
-    Universidade Estadual do Maranhão
-    Centro de Ciências Tecnológicas
-    Departamento de Engenharia da Computação
-    Curso de Engenharia da Computação
-    Disciplina: Estrutura de Dados Básica (ASL092N321)
-    Semestre: 2022.2         Turma: 01
-    Professores:
-        Lúis Carlos Fonseca
-        Pedro Brandão Neto
-
-    Autores:
-        Alunos:
-            Alexsandro Lucena Mota   Código: 20210024710
-
-PROVA PRÁTICA DE ESTRUTURA DE DADOS (AVALIAÇÃO 1):
-TÍTULO: URNA ELETRÔNICA		DATA DE ENTREGA: 05/11/2022
-
-Propósito do Programa: Implementação de uma URNA ELETRÔNICA em C.
-
-Inicialmente usando um registro de eleitores e outro de candidatos com struct,
-sendo as mesmas dinâmicas (isto é, fazendo uso de lista encadeada), forneça as
-funções de inserção e exclusão. Em seguida desenvolva uma função para a votação
-fazendo uso de um registro de votos. Existirão pelo menos 20 candidatos a
-vereador a serem distribuídos nos seguintes partidos: PBA, PBB, PBC, PBD e PBE.
-Um eleitor poderá votar em um candidato cadastrado mas primeiro ele informará na
-urna o seu código e depois o número do candidato desejado. Ao buscar um
-candidato ou eleitor aplique a busca binária. Utilize um menu de opções.
-Finalmente, usando o registro RESULTADO montar um lista cotendo os candidatos
-por ordem descendente de votos e também dos partidos. Salve as informações do
-registro dos eleitores em um arquivo com pelo menos 200 eleitores.
-
-Dados de Manutenção do programa
-
-Data          Programador                 Descrição da Mudança
-==========    ======================      =================================
-2022/13/10    Alexsandro Lucena Mota      - Código original (versão 0.1).
-*******************************************************************************/
+/* Simulador didatico de urna (sem validade eleitoral).
+ * Dados integralmente ficticios; nao adequado a eleicoes reais.
+ */
+#include "simulador.h"
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> /* declaração de strcpy, usado no protótipo */
-#include <locale.h>
-/******************************************************************************/
-/**> Inicialmente, com struct:
-     - 1 registro de eleitores;
-     - 1 resgistro de candidatos
-     fornecer as funções de inserção e exclusão. <**/
+#include <string.h>
 
-/**> Estrutura para registro de eleitores e candidatos <**/
-typedef struct no{
-    int  id;
-    char nome[50];
-    char filiacao[5];
-    struct no *proximo;
-}registro;
-/******************************************************************************/
-/**> criação: retorna um registro vazio <**/
-registro *criar_registro(){
-    return NULL;
-};
-//----------------------------------------------------------------------------//
-/**> vazia: retorna 1 se o registro está vazia, do contrário 0 <**/
-int vazia(registro *reg){
-    return (reg == NULL);
-};
-//----------------------------------------------------------------------------//
-/**> inserção: retorna registro atualizado <**/
-registro *insercao(registro *reg, int codigo, char name[], char partido[]){
-    registro *novo = (registro*) calloc(1,sizeof(registro));
-    if (!novo) { fputs("Sem memória.\n", stderr); return reg; }
-    novo->id = codigo;
-    snprintf(novo->nome, sizeof novo->nome, "%s", name);
-    snprintf(novo->filiacao, sizeof novo->filiacao, "%s", partido);
-    novo->proximo = reg;
-    return novo;
-};
-//---------------------------------------------------------------------------//
-/**> exclusão: exclui um membro do registro <**/
-registro* exclusao(registro *reg, int cod){
-    registro *anterior = NULL;  /**> ponteiro para o membro anterior <**/
-    registro *percorre = reg; /**> ponteiro para percorrer o registro <**/
-    /**> procura elemento no registro, guardando anterior <**/
-    while( (percorre!=NULL) && (percorre->id != cod) ){
-        anterior = percorre;
-        percorre = percorre -> proximo;
-    }
-    /**> verifica se achou o membro <**/
-    if(percorre == NULL){
-        return reg; /**> não achou: retorna registro original <**/
-    }
-    /**> retira o elemento <**/
-    if(anterior == NULL){
-        /**> retira o elemento do inicio <**/
-        reg = percorre->proximo;
-    }
-    else{
-        /**> retira elemento do meio da lista <**/
-        anterior -> proximo = percorre->proximo;
-    }
-    free(percorre);
-    return reg;
-};
-//----------------------------------------------------------------------------//
-/**> imprime a lista de pessoas registradas <**/
-void imprime_registro(registro *reg){
-    registro *pessoa;
-    for(pessoa = reg; pessoa != NULL; pessoa = pessoa->proximo){
-        printf("codigo = %d\n",pessoa->id);
-        printf("nome = %s\n",pessoa->nome);
-        printf("partido = %s\n",pessoa->filiacao);
+static int ler_numero(const char *pergunta,int *valor) {
+    char linha[128],*fim;
+    for(;;) {
+        fputs(pergunta,stdout);fflush(stdout);
+        if(!fgets(linha,sizeof linha,stdin))return 0;
+        size_t n=strcspn(linha,"\n");
+        if(linha[n]!='\n'&&!feof(stdin)) {
+            int ch;while((ch=getchar())!='\n'&&ch!=EOF){}
+            puts("Entrada muito longa; tente novamente.");
+            continue;
+        }
+        errno=0;long l=strtol(linha,&fim,10);
+        while(*fim==' '||*fim=='\t'||*fim=='\r'||*fim=='\n')++fim;
+        if(fim==linha||*fim||errno||l<INT_MIN||l>INT_MAX) {
+            puts("Digite um numero inteiro valido.");continue;
+        }
+        *valor=(int)l;return 1;
     }
 }
-/******************************************************************************/
-int main(){
-    setlocale(LC_ALL,"pbr");
-    /** declara registros de candidatos e eleitores não inicializados*/
-    registro *candidatos;
-    registro *eleitores;
-    /** cria e inicializa registros vazios */
-    candidatos = criar_registro();
-    eleitores = criar_registro();
-/**
-
-Em seguida:
-    - 1 função para a votação fazendo uso de um registro de votos.
-      Existirão pelo menos 20 candidatos a vereador a serem distribuídos nos
-    seguintes partidos: PBA, PBB, PBC, PBD e PBE.
-    - 1 eleitor poderá votar em um candidato cadastrado mas primeiro ele
-    informará na urna o seu código e depois o número do candidato desejado.
-
-    Ao buscar um candidato ou eleitor aplique a busca binária.
-    Utilize um menu de opções.
-
-    Finalmente, usando o registro RESULTADO montar um lista cotendo os
-    candidatos por ordem descendente de votos e também dos partidos.
-
-    Salve as informações do registro dos eleitores em um arquivo com
-    pelo menos 200 eleitores.*/
+int main(void) {
+    Urna urna={0};
+    if(!urna_carregar_demo(&urna)) {
+        fputs("Falha na inicializacao dos dados ficticios.\n",stderr);
+        return 1;
+    }
+    puts("SIMULADOR DIDATICO: NENHUMA VALIDADE ELEITORAL.");
+    puts("200 eleitores e 20 candidatos FICTICIOS; votos somente em memoria.");
+    for(;;) {
+        puts("\n0 Sair | 1 Candidatos | 2 Simular voto | 3 Resultado");
+        puts("4 Exportar eleitores ficticios | 5 Excluir eleitor nao votante");
+        puts("6 Excluir candidato sem votos");
+        int op;
+        if(!ler_numero("Opcao: ",&op)||op==0)break;
+        if(op==1) {
+            urna_exibir_candidatos(&urna,stdout);
+        } else if(op==2) {
+            int e,c;
+            if(!ler_numero("Codigo do eleitor ficticio: ",&e)||
+               !ler_numero("Numero do candidato ficticio: ",&c))break;
+            int status=urna_votar(&urna,e,c);
+            if(status==1)puts("Voto ficticio registrado.");
+            else if(status==0)puts("Eleitor ficticio nao encontrado.");
+            else if(status==-1)puts("Candidato ficticio nao encontrado.");
+            else if(status==-2)puts("Eleitor ficticio ja votou.");
+            else puts("Erro ao registrar voto ficticio.");
+        } else if(op==3) {
+            urna_exibir_resultado(&urna,stdout);
+        } else if(op==4) {
+            if(urna_exportar_eleitores(&urna,"eleitores_demo.csv"))
+                puts("Arquivo eleitores_demo.csv criado com dados ficticios.");
+            else puts("Falha ao criar CSV (arquivo pode ja existir).");
+        } else if(op==5||op==6) {
+            int id;
+            if(!ler_numero(op==5?"Codigo de eleitor ficticio: ":
+                            "Numero de candidato ficticio: ",&id))break;
+            int status=op==5?urna_excluir_eleitor(&urna,id):
+                              urna_excluir_candidato(&urna,id);
+            if(status==1)puts("Registro ficticio excluido.");
+            else if(status==0)puts("Registro ficticio nao encontrado.");
+            else puts("Exclusao bloqueada: registro associado a voto.");
+        } else puts("Opcao invalida.");
+    }
+    urna_limpar(&urna);
+    puts("Simulacao encerrada. Votos descartados da memoria.");
     return 0;
 }
-/******************************************************************************/

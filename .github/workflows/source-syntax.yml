@@ -7,6 +7,8 @@ on:
       - 'tools/check_sources.sh'
       - 'tools/test_legacy_records.py'
       - 'tools/test_search_sort_lists.py'
+      - 'urna_eletronica/tests/test_cli.py'
+      - 'urna_eletronica/tools/test_urna.sh'
       - '**/*.c'
       - '**/*.f'
       - '**/*.for'
@@ -58,6 +60,9 @@ jobs:
       - name: Test search, sort and linked structures
         shell: bash
         run: python3 tools/test_search_sort_lists.py
+      - name: Verify fictional educational voting simulator
+        shell: bash
+        run: bash urna_eletronica/tools/test_urna.sh
       - name: Report totals
         if: always()
         shell: bash
