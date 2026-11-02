@@ -1,33 +1,40 @@
+/* Exercicio didatico de busca binaria em vetor ordenado.
+ * Usa os mesmos nove valores do codigo historico, com alvo opcional.
+ */
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int pertece();
-int main(){
-    printf("Busque um dos dados contidos na lisa L={14, 27, 39, 46, 55, 63, 71, 80, 92}!\n");
-    int tam = 9;
-    int L[9] = {14, 27, 39, 46, 55, 63, 71, 80, 92};
-    printf("O programa busca o dado 63 na lista dada!");
-    int dado = 63;
-    int resultado = pertece(dado,L,tam);
-    if(resultado == 1){
-        printf("Dado encontrado! Pertence a lista.\n");
-    }else{
-        printf("Dado não encontrado! Não pertence a lista.\n");
+int pertence(int x, const int *lista, size_t n) {
+    size_t inicio=0, fim=n;
+    while(inicio<fim) {
+        size_t meio=inicio+(fim-inicio)/2;
+        if(lista[meio]<x) inicio=meio+1;
+        else fim=meio;
     }
-
-    return 0;
+    return inicio<n && lista[inicio]==x;
 }
-int pertece(int x, int L[],int n){
-    int i = 0, f = n - 1, m = 0;
-    while( i <= f){
-        m = (i + f)/2;
-        if( x == L[m]){
-            return 1;
-        }else if( x < L[m]){
-            f = m - 1;
-        }else{
-            i = m + 1;
-        }
+int main(int argc, char **argv) {
+    static const int lista[]={14,27,39,46,55,63,71,80,92};
+    int alvo=63;
+    if(argc>2) {
+        fputs("Uso: busca_binaria_1 [alvo_inteiro]\n",stderr);
+        return 2;
     }
+    if(argc==2) {
+        char *fim;
+        errno=0;
+        long valor=strtol(argv[1],&fim,10);
+        if(errno || fim==argv[1] || *fim || valor<INT_MIN || valor>INT_MAX) {
+            fputs("Alvo nao e inteiro valido.\n",stderr);
+            return 2;
+        }
+        alvo=(int)valor;
+    }
+    printf("Busca binaria de %d em {14,27,39,46,55,63,71,80,92}.\n",alvo);
+    puts(pertence(alvo,lista,sizeof lista/sizeof lista[0])
+         ?"Dado encontrado! Pertence a lista."
+         :"Dado nao encontrado! Nao pertence a lista.");
     return 0;
 }
