@@ -4,6 +4,10 @@ Coleção de exercícios didáticos independentes em C, com um exemplo adicional
 
 **Documentação atualizada em 02/11/2026**, com referência à evidência dos workflows do GitHub Actions e à política de preservação do código anterior no histórico Git.
 
+## Política de preservação — 02/11/2026
+
+A [política de retenção científica e dos binários históricos](POLITICA-PRESERVACAO-CIENTIFICA-2026-11-02.md) documenta classes de arquivos, critérios de reprodutibilidade, direitos, backup independente e bloqueios para exclusões. **Nenhum executável antigo está autorizado para remoção automática.**
+
 ## Onde encontrar os projetos
 
 | Grupo | Pastas |
