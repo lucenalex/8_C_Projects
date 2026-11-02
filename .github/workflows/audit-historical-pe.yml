@@ -1,0 +1,36 @@
+name: Read-only audit of historical Windows executables
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-historical-pe.yml'
+      - 'tools/audit_historical_pe.py'
+      - 'MANIFESTO-EXECUTAVEIS-HISTORICOS-2026-11-02.csv'
+      - '**/*.exe'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-historical-pe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout versioned files without persistent credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify PE headers, SHA256, Git SHA and CodeBlocks mappings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/audit_historical_pe.py --report "$RUNNER_TEMP/historical-pe/audit.json"
+      - name: Upload static provenance report (no executable contents)
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: historical-pe-static-audit
+          path: ${{ runner.temp }}/historical-pe/
+          retention-days: 14
+          if-no-files-found: warn
