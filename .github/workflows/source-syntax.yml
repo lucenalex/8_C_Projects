@@ -47,6 +47,9 @@ jobs:
         if: always()
         shell: bash
         run: bash tools/smoke_tests.sh
+      - name: Verify agenda (unit, capacity and CLI boundary cases)
+        shell: bash
+        run: bash EDB_SL2_Desafio_1/tools/test_agenda.sh
       - name: Report totals
         if: always()
         shell: bash
