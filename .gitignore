@@ -1,0 +1,21 @@
+# Code::Blocks / compiladores C: somente para NOVOS arquivos não rastreados.
+**/bin/Debug/
+**/bin/Release/
+**/obj/Debug/
+**/obj/Release/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.pdb
+*.layout
+*.depend
+*.swp
+*~
+*.bak
+**/.vs/
+
+# Preservar: .c, .h, .cbp, .txt, .bin, documentação e recursos fonte.
+# Não usar *.bin: alguns binários podem ser dados de entrada originais.
